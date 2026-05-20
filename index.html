@@ -346,6 +346,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px;opacity:.3}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -394,11 +395,17 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="sub" id="homeDailySub">残り0日 / 予算残 ¥0</div>
     </div>
 
-    <div class="section-header">
-      <span class="section-title">最近の支出</span>
+    <!-- Pace Indicator -->
+    <div class="card" id="homePace" style="display:flex;align-items:center;gap:18px;padding:18px"></div>
+
+    <!-- Monthly Summary -->
+    <div class="card" id="homeMonthlySummary" style="padding:16px 18px"></div>
+
+    <!-- Mini Chart -->
+    <div class="card" style="padding:16px 18px">
+      <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">残高推移</div>
+      <div style="height:80px" id="homeMiniChart"></div>
     </div>
-    <div id="homeTimeline"></div>
-    <div id="homeTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
   </div>
 
   <!-- Page 2: Forecast -->
@@ -476,10 +483,19 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
   </div>
 
-  <!-- Page 3: Analysis -->
-  <div class="page" id="pageAnalysis">
+  <!-- Page 3: Record -->
+  <div class="page" id="pageRecord">
+    <div style="text-align:center;margin-bottom:12px">
+      <h2 style="font-size:1.05rem;font-weight:700" id="recordMonth">5月の家計簿</h2>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;background:var(--accent-soft);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:.72rem;color:var(--accent);font-weight:500">
+      <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      支出を記録すると予測にリアルタイム反映されます
+    </div>
+
     <div class="section-header">
-      <span class="section-title" id="analysisMonth">5月の予算</span>
+      <span class="section-title" id="analysisMonth">カテゴリ別予算</span>
       <button class="btn-edit-budget" id="btnEditBudgets" aria-label="Edit budgets">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span>編集</span>
@@ -498,6 +514,17 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       </div>
       <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.68rem"></div>
     </div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-title">最近の支出</span>
+    </div>
+    <div id="recordTimeline"></div>
+    <div id="recordTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
+
+    <button id="btnSettle" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      今月を確定する
+    </button>
   </div>
 
   <!-- Page 4: Settings -->
@@ -577,12 +604,12 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <span>ホーム</span>
   </button>
   <button class="tab-btn" data-idx="1">
-    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    <span>予測</span>
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    <span>記録</span>
   </button>
   <button class="tab-btn" data-idx="2">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0110 10"/><line x1="12" y1="12" x2="12" y2="6"/></svg>
-    <span>分析</span>
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>予測</span>
   </button>
   <button class="tab-btn" data-idx="3">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -772,8 +799,8 @@ function autoCarryover(){
 const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
 // ===== NAVIGATION =====
-let curPage=0;const pageIds=['pageHome','pageForecast','pageAnalysis','pageSettings'];
-const renderFns=[renderHome,renderForecast,renderAnalysis,renderSettings];
+let curPage=0;const pageIds=['pageHome','pageRecord','pageForecast','pageSettings'];
+const renderFns=[renderHome,renderRecord,renderForecast,renderSettings];
 function isMobile(){return window.innerWidth<=640}
 
 function goToPage(idx){
@@ -896,12 +923,82 @@ function renderHome(){
   $('homeDailyBudget').textContent=fmt(daily);
   $('homeDailySub').textContent='残り'+daysLeft+'日 / 予算残 '+fmt(remaining);
 
-  // Timeline
-  renderTimeline();
+  // Pace indicator
+  renderPace(totalBudget,totalSpent,daysLeft);
+  // Monthly summary
+  renderMonthlySummary();
+  // Mini chart
+  renderMiniChart();
 }
 
-function renderTimeline(){
-  const c=$('homeTimeline'),empty=$('homeTimelineEmpty');
+function renderPace(totalBudget,totalSpent,daysLeft){
+  const c=$('homePace');
+  if(totalBudget<=0){c.style.display='none';return}
+  c.style.display='flex';
+  const n=now(),day=n.getDate(),lastDay=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
+  const budgetPct=Math.min(Math.round(totalSpent/totalBudget*100),100);
+  const timePct=Math.round(day/lastDay*100);
+  const circ=2*Math.PI*38,budgetDash=(budgetPct/100*circ).toFixed(1),timeDash=(timePct/100*circ).toFixed(1);
+  let color='var(--accent)',msgClass='ok',msg='順調なペースです';
+  if(budgetPct>timePct+15){color='var(--orange)';msgClass='warn';msg='消化ペースがやや速めです'}
+  if(budgetPct>90){color='var(--red)';msgClass='over';msg='予算残りわずかです'}
+  const msgBg=msgClass==='ok'?'rgba(20,184,166,.06)':msgClass==='warn'?'rgba(245,158,11,.06)':'rgba(239,68,68,.06)';
+  const msgColor=msgClass==='ok'?'var(--accent2)':msgClass==='warn'?'#92400E':'#B91C1C';
+  c.innerHTML='<div style="position:relative;width:96px;height:96px;flex-shrink:0">'
+    +'<svg viewBox="0 0 96 96" width="96" height="96" style="transform:rotate(-90deg)">'
+    +'<circle cx="48" cy="48" r="38" fill="none" stroke="var(--bg)" stroke-width="7"/>'
+    +'<circle cx="48" cy="48" r="38" fill="none" stroke="rgba(20,184,166,.18)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+timeDash+' '+circ+'"/>'
+    +'<circle cx="48" cy="48" r="38" fill="none" stroke="'+color+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+budgetDash+' '+circ+'"/>'
+    +'</svg>'
+    +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">'
+    +'<div style="font-family:var(--font-num);font-size:1.2rem;font-weight:700;color:'+color+'">'+budgetPct+'%</div>'
+    +'<div style="font-size:.48rem;color:var(--text3)">予算消化</div></div></div>'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:'+color+'"></div><span style="font-size:.72rem;color:var(--text2)">予算消化 <strong style="font-family:var(--font-num);color:var(--text)">'+budgetPct+'%</strong></span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:rgba(20,184,166,.3)"></div><span style="font-size:.72rem;color:var(--text2)">経過日数 <strong style="font-family:var(--font-num);color:var(--text)">'+timePct+'%</strong>（'+day+'日目/'+lastDay+'日）</span></div>'
+    +'<div style="font-size:.68rem;padding:6px 10px;border-radius:8px;background:'+msgBg+';color:'+msgColor+';font-weight:500">'+msg+'</div></div>';
+}
+
+function renderMonthlySummary(){
+  const c=$('homeMonthlySummary'),cy=cY(),cm=cM();
+  let chips='';
+  // Show up to 3 previous months as "settled" if archive exists
+  for(let i=3;i>=1;i--){
+    const{year,month}=addM(cy,cm,-i);
+    const key=year+'-'+String(month).padStart(2,'0');
+    if(data.spendingArchive&&data.spendingArchive[key]){
+      chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:var(--green-soft);color:var(--accent);display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'+month+'月</span>';
+    }
+  }
+  chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:rgba(245,158,11,.08);color:#D97706;display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite"></span>'+cm+'月 記録中</span>';
+  c.innerHTML='<div style="font-size:.78rem;font-weight:700;margin-bottom:10px">月次サマリー</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
+    +'<div style="font-size:.65rem;color:var(--text3)">確定が増えるほど予測が正確になります</div>';
+}
+
+function renderMiniChart(){
+  const c=$('homeMiniChart'),fc=getForecast(4);
+  if(!fc.length){c.innerHTML='<div class="empty" style="font-size:.72rem">データを入力してください</div>';return}
+  const vals=fc.map(f=>f.balance),maxV=Math.max(...vals),minV=Math.min(...vals);
+  const range=maxV-minV||1,W=300,H=80,pad=4;
+  const pts=vals.map((v,i)=>{const x=i/(vals.length-1)*W;const y=pad+(1-(v-minV)/range)*(H-pad*2-15);return{x,y}});
+  let path='M'+pts.map(p=>p.x+','+p.y).join(' L');
+  let area=path+' L'+W+','+H+' L0,'+H+'Z';
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="100%" preserveAspectRatio="none">'
+    +'<defs><linearGradient id="mcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(20,184,166,.12)"/><stop offset="100%" stop-color="rgba(20,184,166,0)"/></linearGradient></defs>'
+    +'<path d="'+area+'" fill="url(#mcg)"/>'
+    +'<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+  pts.forEach((p,i)=>{
+    const isLast=i===pts.length-1;
+    svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="var(--accent)"'+(isLast?' stroke="#fff" stroke-width="2"':'')+'/>';
+  });
+  fc.forEach((f,i)=>{const x=i/(fc.length-1)*W;svg+='<text x="'+Math.min(x,W-20)+'" y="'+(H-2)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)">'+f.month+'月</text>'});
+  svg+='</svg>';
+  c.innerHTML=svg;
+}
+
+function renderTimeline(containerId,emptyId){
+  const c=$(containerId),empty=$(emptyId);
   if(data.spending.length===0){c.innerHTML='';empty.style.display='block';return}
   empty.style.display='none';
   const sorted=[...data.spending].sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -1037,9 +1134,10 @@ function buildChart(fc){
   s+='</svg>';return s;
 }
 
-// ===== ANALYSIS =====
-function renderAnalysis(){
-  $('analysisMonth').textContent=cM()+'月の予算';
+// ===== RECORD =====
+function renderRecord(){
+  $('recordMonth').textContent=cM()+'月の家計簿';
+  $('analysisMonth').textContent='カテゴリ別予算';
   const byCat=getSpendingByCat(),daysLeft=getDaysLeft(),c=$('budgetCards');
   let h='';
   data.budgets.forEach(b=>{
@@ -1053,6 +1151,7 @@ function renderAnalysis(){
   });
   c.innerHTML=h;
   renderDonut();
+  renderTimeline('recordTimeline','recordTimelineEmpty');
 }
 
 function renderDonut(){
@@ -1185,7 +1284,7 @@ function initInput(){
   $('btnSpendSave').addEventListener('click',()=>{
     const amt=parseFloat($('inpSpendAmt').value);if(!amt||amt<=0)return $('inpSpendAmt').focus();
     data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:$('inpSpendCat').value,memo:$('inpSpendMemo').value.trim()});
-    saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===2)renderAnalysis();checkBudgetAlerts();
+    saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===1)renderRecord();checkBudgetAlerts();
   });
   $('inpSpendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSpendSave').click()});
 }
@@ -1200,7 +1299,7 @@ function initBalance(){
 function initBudget(){
   $('btnEditBudgets').addEventListener('click',()=>{renderBudgetEdit();showModal('modalBudget')});
   $('btnAddCat').addEventListener('click',()=>{const n=$('newCatName').value.trim();if(!n)return;if(data.budgets.some(b=>b.name===n))return alert('同名カテゴリあり');data.budgets.push({id:genId(),name:n,amount:0});$('newCatName').value='';renderBudgetEdit()});
-  $('btnBudgetSave').addEventListener('click',()=>{$$('#budgetEditList .be-amt').forEach(inp=>{const b=data.budgets.find(x=>x.id===inp.dataset.id);if(b)b.amount=parseFloat(inp.value)||0});saveNow();renderAnalysis();hideModal('modalBudget')});
+  $('btnBudgetSave').addEventListener('click',()=>{$$('#budgetEditList .be-amt').forEach(inp=>{const b=data.budgets.find(x=>x.id===inp.dataset.id);if(b)b.amount=parseFloat(inp.value)||0});saveNow();renderRecord();hideModal('modalBudget')});
 }
 function renderBudgetEdit(){
   const c=$('budgetEditList');c.innerHTML='';

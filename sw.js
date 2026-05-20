@@ -1,8 +1,9 @@
-const CACHE_NAME = 'moneyflow-v1';
+const CACHE_NAME = 'moneyflow-v2';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -43,6 +44,20 @@ self.addEventListener('fetch', (event) => {
               return caches.match('./index.html');
             }
           });
+      })
+  );
+});
+
+// Notification click - open the app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((windowClients) => {
+        if (windowClients.length > 0) {
+          return windowClients[0].focus();
+        }
+        return clients.openWindow('./');
       })
   );
 });

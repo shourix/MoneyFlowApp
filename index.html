@@ -126,7 +126,7 @@ text-align:center;color:#fff;
 }
 .daily-hero .label{font-size:.8rem;opacity:.85;margin-bottom:4px}
 .daily-hero .amount{font-family:var(--font-num);font-size:2.4rem;font-weight:700;letter-spacing:-.02em}
-.daily-hero .sub{font-size:.75rem;opacity:.7;margin-top:6px}
+.daily-hero .sub{font-size:.78rem;opacity:1;margin-top:6px;background:rgba(255,255,255,.18);display:inline-block;padding:3px 12px;border-radius:20px;letter-spacing:.02em}
 
 /* Timeline */
 .timeline-day{margin-bottom:16px}
@@ -428,7 +428,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
         <svg class="collapse-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="collapse-body" id="fcDetailBody">
-        <div style="padding-top:8px" id="fcBreakdown"></div>
+        <div style="padding-top:8px;max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch" id="fcBreakdown"></div>
       </div>
     </div>
 
@@ -454,11 +454,12 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="collapse-body" id="simBody">
         <div style="padding-top:12px">
           <div style="font-size:.78rem;font-weight:500;color:var(--text2);margin-bottom:4px">残業時間</div>
-          <input type="range" class="range-slider" id="simOT" min="0" max="80" value="0">
+          <div style="padding:8px 0"><input type="range" class="range-slider" id="simOT" min="0" max="80" value="0" style="margin:0"></div>
           <div style="text-align:center;font-family:var(--font-num);font-size:.95rem;color:var(--accent)" id="simOTResult">0h → ¥0</div>
+          <div style="text-align:center;font-size:.65rem;color:var(--text3);margin-top:2px" id="simOTDesc">予想月収（現在との差額）</div>
           <div style="margin-top:16px;font-size:.78rem;font-weight:500;color:var(--text2);margin-bottom:4px">副業収入</div>
           <input type="number" inputmode="decimal" class="form-input" id="simSide" placeholder="仮の副業収入" style="margin-bottom:6px">
-          <div style="text-align:center;font-size:.85rem;color:var(--text2)">影響: <span id="simSideResult" style="font-family:var(--font-num);color:var(--accent)">+¥0</span></div>
+          <div style="text-align:center;font-size:.85rem;color:var(--text2)">現在との差額: <span id="simSideResult" style="font-family:var(--font-num);color:var(--accent)">+¥0</span></div>
         </div>
       </div>
     </div>
@@ -545,6 +546,13 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="toggle-row">
         <span style="font-size:.88rem">ダークモード</span>
         <div class="toggle-track" id="toggleDark"><div class="toggle-thumb"></div></div>
+      </div>
+      <div class="toggle-row" id="notifRow" style="margin-top:10px">
+        <div>
+          <span style="font-size:.88rem">予算アラート通知</span>
+          <div style="font-size:.68rem;color:var(--text3);margin-top:2px">週の予算超過・月半ばのペース警告</div>
+        </div>
+        <div class="toggle-track" id="toggleNotif"><div class="toggle-thumb"></div></div>
       </div>
       <div style="margin-top:12px">
         <div class="backup-row">
@@ -672,7 +680,7 @@ function defaultData(){
       {id:'b4',name:'日用品',amount:0},{id:'b5',name:'交際費',amount:0},{id:'b6',name:'美容',amount:0},{id:'b7',name:'その他',amount:0}
     ],
     spending:[],spendingArchive:{},
-    settings:{darkMode:false}
+    settings:{darkMode:false,notifications:false}
   };
 }
 
@@ -795,6 +803,7 @@ function initNav(){
 
   inner.addEventListener('touchstart',e=>{
     if(!isMobile()||animating)return;
+    if(e.target.closest('input[type=range]'))return;
     const t=e.touches[0];
     sx=t.clientX;sy=t.clientY;
     dragging=true;decided=false;isH=false;
@@ -969,7 +978,9 @@ function initForecast(){
 
 function updateSimOT(){
   const h=+$('simOT').value||0,cy=cY(),cm=cM(),base=getIncome(cy,cm),sim=getIncome(cy,cm,h);
-  $('simOTResult').textContent=h+'h → '+fmt(sim)+' ('+fmtS(sim-base)+')';
+  const diff=sim-base;
+  $('simOTResult').textContent=h+'h → '+fmt(sim)+(diff!==0?' ('+fmtS(diff)+')':'');
+  $('simOTDesc').textContent=diff!==0?'予想月収（現在との差額 '+fmtS(diff)+'）':'残業なしの月収';
   renderFcChart(h,parseFloat($('simSide').value)||undefined);
 }
 function updateSimSide(){
@@ -1086,6 +1097,20 @@ function initSettings(){
   function updDark(){if(data.settings.darkMode){t.classList.add('on');document.documentElement.classList.add('dark')}else{t.classList.remove('on');document.documentElement.classList.remove('dark')}}
   t.addEventListener('click',()=>{data.settings.darkMode=!data.settings.darkMode;updDark();saveData()});updDark();
 
+  // Notifications
+  const nt=$('toggleNotif'),nr=$('notifRow');
+  if(!('Notification' in window)){nr.style.display='none'}
+  function updNotif(){if(data.settings.notifications){nt.classList.add('on')}else{nt.classList.remove('on')}}
+  nt.addEventListener('click',async()=>{
+    if(!data.settings.notifications){
+      const perm=await Notification.requestPermission();
+      if(perm==='granted'){data.settings.notifications=true;updNotif();saveData();checkBudgetAlerts()}
+      else{alert('通知がブロックされています。ブラウザの設定から許可してください。')}
+    }else{
+      data.settings.notifications=false;updNotif();saveData();
+    }
+  });updNotif();
+
   // Export
   $('btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='moneyflow_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u)});
   $('btnImport').addEventListener('click',()=>$('fileImport').click());
@@ -1140,7 +1165,7 @@ function initInput(){
   $('btnSpendSave').addEventListener('click',()=>{
     const amt=parseFloat($('inpSpendAmt').value);if(!amt||amt<=0)return $('inpSpendAmt').focus();
     data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:$('inpSpendCat').value,memo:$('inpSpendMemo').value.trim()});
-    saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===2)renderAnalysis();
+    saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===2)renderAnalysis();checkBudgetAlerts();
   });
   $('inpSpendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSpendSave').click()});
 }
@@ -1165,6 +1190,85 @@ function renderBudgetEdit(){
   c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{if(confirm('カテゴリ「'+data.budgets.find(b=>b.id===btn.dataset.id)?.name+'」を削除？')){data.budgets=data.budgets.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
 }
 
+// ===== BUDGET NOTIFICATIONS =====
+const NOTIF_SK='moneyflow_notif';
+function getNotifState(){try{return JSON.parse(localStorage.getItem(NOTIF_SK))||{}}catch(e){return{}}}
+function setNotifState(s){localStorage.setItem(NOTIF_SK,JSON.stringify(s))}
+
+function sendNotif(title,body,tag){
+  if(!data.settings.notifications||Notification.permission!=='granted')return;
+  const s=getNotifState(),today=new Date().toISOString().slice(0,10);
+  if(s[tag]===today)return; // 同じ日に同じ種類は1回だけ
+  s[tag]=today;setNotifState(s);
+  if('serviceWorker' in navigator&&navigator.serviceWorker.controller){
+    navigator.serviceWorker.ready.then(reg=>{reg.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png',tag})});
+  }else{new Notification(title,{body,icon:'icon-192.png',tag})}
+}
+
+function checkBudgetAlerts(){
+  if(!data.settings.notifications||Notification.permission!=='granted')return;
+  const byCat=getSpendingByCat(),n=now(),day=n.getDate(),lastDay=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
+  let totalBudget=0,totalSpent=0;
+  Object.values(byCat).forEach(v=>{totalBudget+=v.budget;totalSpent+=v.spent});
+
+  // 月半ばチェック: 15日以降 && 予算消化率60%超
+  if(day>=15&&totalBudget>0){
+    const pct=Math.round(totalSpent/totalBudget*100);
+    if(pct>=60){
+      sendNotif(
+        '今月のペースが速いかも',
+        '予算の'+pct+'%を使用済み（残り'+(lastDay-day)+'日）',
+        'monthly-pace'
+      );
+    }
+  }
+
+  // 月末マイナス予測チェック
+  if(totalBudget>0&&totalSpent>totalBudget){
+    sendNotif(
+      '今月の予算をオーバーしています',
+      '予算 '+fmt(totalBudget)+' に対し '+fmt(totalSpent)+' 使用中',
+      'monthly-over'
+    );
+  }
+
+  // 週の予算超過チェック: 今週(月〜日)の支出 > 月予算÷4
+  if(totalBudget>0){
+    const weekBudget=Math.round(totalBudget/4);
+    const dayOfWeek=n.getDay()||7; // 月=1 ... 日=7
+    const weekStart=new Date(n.getFullYear(),n.getMonth(),n.getDate()-dayOfWeek+1);
+    weekStart.setHours(0,0,0,0);
+    let weekSpent=0;
+    data.spending.forEach(s=>{
+      const sd=new Date(s.date);
+      if(sd>=weekStart)weekSpent+=s.amount||0;
+    });
+    if(weekSpent>weekBudget){
+      sendNotif(
+        '今週の支出が多めです',
+        '週の目安 '+fmt(weekBudget)+' に対し '+fmt(weekSpent)+' 使用中',
+        'weekly-over'
+      );
+    }
+  }
+
+  // カテゴリ別チェック: 個別カテゴリが80%超 (月半ば以降)
+  if(day>=15){
+    Object.entries(byCat).forEach(([name,v])=>{
+      if(v.budget>0){
+        const pct=Math.round(v.spent/v.budget*100);
+        if(pct>=80){
+          sendNotif(
+            name+'の予算が残りわずか',
+            '予算の'+pct+'%を使用済み（残り'+fmt(v.budget-v.spent)+'）',
+            'cat-'+name
+          );
+        }
+      }
+    });
+  }
+}
+
 // ===== SERVICE WORKER =====
 function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}
 
@@ -1173,6 +1277,7 @@ function init(){
   loadData();autoCarryover();
   initNav();initCollapse();initInput();initBalance();initFixedModal();initBudget();initForecast();initSettings();regSW();
   goToPage(0);
+  setTimeout(checkBudgetAlerts,2000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

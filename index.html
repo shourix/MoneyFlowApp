@@ -627,7 +627,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 <div class="modal-overlay" id="modalFixed">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:16px">固定費を追加</h3>
+    <h3 style="font-size:1rem;margin-bottom:16px" id="fixedModalTitle">固定費を追加</h3>
     <div class="form-group">
       <label class="form-label">名称</label>
       <input type="text" class="form-input" id="fixedName" placeholder="例: 家賃">
@@ -643,7 +643,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <div id="fixedLoanFields" style="display:none">
       <div class="form-group"><label class="form-label">残り回数</label><input type="number" inputmode="decimal" class="form-input" id="fixedRemain" placeholder="0" min="0"></div>
     </div>
-    <button class="btn-primary" style="margin-top:8px" id="btnFixedSave">追加</button>
+    <button class="btn-primary" style="margin-top:8px" id="btnFixedSave">保存</button>
   </div>
 </div>
 
@@ -1124,7 +1124,7 @@ function renderFixedList(){
   data.expenses.fixed.forEach((item,idx)=>{
     const div=document.createElement('div');div.className='exp-item';div.draggable=true;div.dataset.idx=idx;
     let meta='';if(item.isLoan){const po=loanPayoff(item);meta='<div class="exp-meta">ローン | 残り'+(item.remainingCount||0)+'回 | 完済: '+(po?mLabel(po.year,po.month):'--')+'</div>'}
-    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body"><div class="exp-name">'+(item.name||'固定費')+(item.isLoan?' <span class="tag tag-loan">ローン</span>':'')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-id="'+item.id+'">×</button>';
+    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-edit-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'固定費')+(item.isLoan?' <span class="tag tag-loan">ローン</span>':'')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-id="'+item.id+'">×</button>';
     // Drag
     div.addEventListener('dragstart',()=>{dragIdx=idx;div.classList.add('dragging')});
     div.addEventListener('dragend',()=>{div.classList.remove('dragging');c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'))});
@@ -1138,17 +1138,37 @@ function renderFixedList(){
     c.appendChild(div);
   });
   c.querySelectorAll('.exp-del').forEach(b=>{b.addEventListener('click',()=>{const item=data.expenses.fixed.find(f=>f.id===b.dataset.id);if(item&&confirm('「'+item.name+'」を削除？')){data.expenses.fixed=data.expenses.fixed.filter(f=>f.id!==b.dataset.id);saveNow();renderFixedList()}})});
+  c.querySelectorAll('[data-edit-id]').forEach(b=>{b.addEventListener('click',()=>{openFixedEdit(b.dataset.editId)})});
 }
 
+let editingFixedId=null;
+function openFixedEdit(id){
+  const item=data.expenses.fixed.find(f=>f.id===id);if(!item)return;
+  const lt=$('fixedLoanToggle');
+  editingFixedId=id;
+  $('fixedModalTitle').textContent='固定費を編集';
+  $('fixedName').value=item.name||'';
+  $('fixedAmt').value=item.amount||'';
+  $('fixedRemain').value=item.remainingCount||'';
+  if(item.isLoan){lt.classList.add('on');$('fixedLoanFields').style.display='block'}
+  else{lt.classList.remove('on');$('fixedLoanFields').style.display='none'}
+  showModal('modalFixed');
+}
 function initFixedModal(){
   const lt=$('fixedLoanToggle');
   lt.addEventListener('click',()=>{lt.classList.toggle('on');$('fixedLoanFields').style.display=lt.classList.contains('on')?'block':'none'});
-  $('btnAddFixed').addEventListener('click',()=>{$('fixedName').value='';$('fixedAmt').value='';$('fixedRemain').value='';lt.classList.remove('on');$('fixedLoanFields').style.display='none';showModal('modalFixed')});
+  $('btnAddFixed').addEventListener('click',()=>{editingFixedId=null;$('fixedModalTitle').textContent='固定費を追加';$('fixedName').value='';$('fixedAmt').value='';$('fixedRemain').value='';lt.classList.remove('on');$('fixedLoanFields').style.display='none';showModal('modalFixed')});
   $('btnFixedSave').addEventListener('click',()=>{
     const name=$('fixedName').value.trim(),amt=parseFloat($('fixedAmt').value)||0;
     if(!name)return alert('名称を入力');if(amt<=0)return alert('金額を入力');
-    data.expenses.fixed.push({id:genId(),name,amount:amt,isLoan:lt.classList.contains('on'),remainingCount:lt.classList.contains('on')?(+$('fixedRemain').value||0):0,startDate:new Date().toISOString()});
-    saveNow();renderFixedList();hideModal('modalFixed');
+    const isLoan=lt.classList.contains('on'),remain=isLoan?(+$('fixedRemain').value||0):0;
+    if(editingFixedId){
+      const item=data.expenses.fixed.find(f=>f.id===editingFixedId);
+      if(item){item.name=name;item.amount=amt;item.isLoan=isLoan;item.remainingCount=remain}
+    }else{
+      data.expenses.fixed.push({id:genId(),name,amount:amt,isLoan,remainingCount:remain,startDate:new Date().toISOString()});
+    }
+    editingFixedId=null;saveNow();renderFixedList();hideModal('modalFixed');
   });
 }
 

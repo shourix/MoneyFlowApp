@@ -73,25 +73,14 @@ overflow:hidden;
 .page.active{display:block}
 }
 
-/* Bottom Nav - Dots (mobile) */
-.dots-nav{
-position:fixed;bottom:var(--safe-bottom);left:0;right:0;
-height:var(--bottom-h);display:flex;align-items:center;justify-content:center;gap:8px;
-background:var(--bg);z-index:50;
-}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--text3);opacity:.3;transition:all .3s;cursor:pointer}
-.dot.active{width:24px;border-radius:4px;opacity:1;background:var(--accent)}
-@media(min-width:641px){.dots-nav{display:none}}
-
-/* Bottom Nav - Tabs (desktop) */
+/* Bottom Nav - Tabs */
 .tab-nav{
 position:fixed;bottom:0;left:0;right:0;z-index:50;
 height:calc(var(--bottom-h) + 8px + var(--safe-bottom));
 padding-bottom:var(--safe-bottom);
 background:var(--card);border-top:1px solid var(--border);
-display:none;justify-content:center;gap:0;max-width:600px;margin:0 auto;
+display:flex;justify-content:center;gap:0;max-width:600px;margin:0 auto;
 }
-@media(min-width:641px){.tab-nav{display:flex}}
 .tab-btn{
 flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;
 gap:2px;color:var(--text3);transition:color .2s;position:relative;
@@ -287,7 +276,7 @@ transition:all .2s;
 /* Chart */
 .chart-container{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .chart-range{display:flex;gap:0;margin-bottom:10px}
-.chart-range .seg-btn{min-width:0;padding:0 8px;font-size:.7rem;height:30px}
+.chart-range .seg-btn{min-width:0;padding:0 10px;font-size:.72rem;height:30px}
 
 /* Loan Card */
 .loan-card{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)}
@@ -320,6 +309,16 @@ background:var(--bg);transition:all .2s;
 }
 .icon-btn:active{transform:scale(.9);background:var(--accent-soft)}
 .icon-btn svg{width:16px;height:16px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Budget Edit Button */
+.btn-edit-budget{
+display:flex;align-items:center;gap:4px;
+padding:6px 14px;border-radius:20px;
+background:var(--green-soft);color:var(--green);
+font-size:.75rem;font-weight:600;transition:all .2s;
+}
+.btn-edit-budget svg{width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn-edit-budget:active{transform:scale(.95);opacity:.8}
 
 /* Deduction Display */
 .ded-line{display:flex;justify-content:space-between;padding:3px 0;font-size:.8rem}
@@ -437,9 +436,9 @@ background:var(--bg);transition:all .2s;
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="font-size:.78rem;font-weight:600;color:var(--text2)">残高推移</span>
         <div class="segment chart-range" style="margin:0;width:auto">
-          <button class="seg-btn fc-range active" data-range="6">6m</button>
-          <button class="seg-btn fc-range" data-range="12">12m</button>
-          <button class="seg-btn fc-range" data-range="24">24m</button>
+          <button class="seg-btn fc-range active" data-range="3">3ヶ月</button>
+          <button class="seg-btn fc-range" data-range="6">6ヶ月</button>
+          <button class="seg-btn fc-range" data-range="12">12ヶ月</button>
         </div>
       </div>
       <div class="chart-container" id="fcChart"></div>
@@ -479,8 +478,9 @@ background:var(--bg);transition:all .2s;
   <div class="page" id="pageAnalysis">
     <div class="section-header">
       <span class="section-title" id="analysisMonth">5月の予算</span>
-      <button class="icon-btn" id="btnEditBudgets" aria-label="Edit budgets">
+      <button class="btn-edit-budget" id="btnEditBudgets" aria-label="Edit budgets">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>編集</span>
       </button>
     </div>
     <div id="budgetCards"></div>
@@ -558,16 +558,8 @@ background:var(--bg);transition:all .2s;
 </div>
 </div>
 
-<!-- Dots Nav (mobile) -->
-<div class="dots-nav" id="dotsNav">
-  <span class="dot active" data-idx="0"></span>
-  <span class="dot" data-idx="1"></span>
-  <span class="dot" data-idx="2"></span>
-  <span class="dot" data-idx="3"></span>
-</div>
-
-<!-- Tab Nav (desktop) -->
-<nav class="tab-nav">
+<!-- Tab Nav -->
+<nav class="tab-nav" id="tabNav">
   <button class="tab-btn active" data-idx="0">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>ホーム</span>
@@ -773,52 +765,85 @@ const renderFns=[renderHome,renderForecast,renderAnalysis,renderSettings];
 function isMobile(){return window.innerWidth<=640}
 
 function goToPage(idx){
+  idx=Math.max(0,Math.min(idx,pageIds.length-1));
   curPage=idx;
+  const inner=$('swipeInner');
   if(isMobile()){
-    $('swipeInner').style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
-    $('swipeInner').style.transform='translateX(-'+(idx*100)+'%)';
+    inner.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
+    inner.style.transform='translateX('+(-(idx*100))+'%)';
   }else{
     $$('.page').forEach(p=>p.classList.remove('active'));
     $(pageIds[idx]).classList.add('active');
   }
-  $$('.dot').forEach((d,i)=>{d.classList.toggle('active',i===idx)});
   $$('.tab-btn').forEach((b,i)=>{b.classList.toggle('active',i===idx)});
   renderFns[idx]();
 }
 
 function initNav(){
-  // Dots
-  $$('.dot').forEach(d=>{d.addEventListener('click',()=>goToPage(+d.dataset.idx))});
   // Tabs
   $$('.tab-btn').forEach(b=>{b.addEventListener('click',()=>goToPage(+b.dataset.idx))});
 
   // Swipe
   const inner=$('swipeInner');
-  let sx,sy,dragging=false,decided=false,isH=false;
-  inner.addEventListener('touchstart',e=>{if(!isMobile())return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;dragging=true;decided=false;isH=false;inner.style.transition='none'},{passive:true});
+  let sx=0,sy=0,dragging=false,decided=false,isH=false,animating=false;
+
+  inner.addEventListener('transitionend',()=>{animating=false});
+
+  inner.addEventListener('touchstart',e=>{
+    if(!isMobile()||animating)return;
+    const t=e.touches[0];
+    sx=t.clientX;sy=t.clientY;
+    dragging=true;decided=false;isH=false;
+    inner.style.transition='none';
+  },{passive:true});
+
   inner.addEventListener('touchmove',e=>{
     if(!dragging||!isMobile())return;
-    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
-    if(!decided){if(Math.abs(dx)>8||Math.abs(dy)>8){isH=Math.abs(dx)>Math.abs(dy);decided=true}else return}
+    const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(!decided){
+      if(Math.abs(dx)>8||Math.abs(dy)>8){isH=Math.abs(dx)>Math.abs(dy);decided=true}
+      else return;
+    }
     if(!isH)return;
     e.preventDefault();
-    const offset=-curPage*100+(dx/window.innerWidth)*100;
-    inner.style.transform='translateX('+offset+'%)';
+    // Clamp drag so it can't go past first/last page
+    let raw=-curPage*100+(dx/window.innerWidth)*100;
+    const minX=-(pageIds.length-1)*100,maxX=0;
+    raw=Math.max(minX-20,Math.min(maxX+20,raw));
+    inner.style.transform='translateX('+raw+'%)';
   },{passive:false});
-  inner.addEventListener('touchend',e=>{
-    if(!dragging||!isMobile()){dragging=false;return}
+
+  function endSwipe(endX){
+    if(!dragging){return}
     dragging=false;
-    if(!isH){inner.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';inner.style.transform='translateX(-'+(curPage*100)+'%)';return}
-    const dx=e.changedTouches[0].clientX-sx;
-    if(dx<-50&&curPage<3)goToPage(curPage+1);
+    if(!isH||!decided){
+      inner.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
+      inner.style.transform='translateX('+(-(curPage*100))+'%)';
+      return;
+    }
+    const dx=endX-sx;
+    animating=true;
+    if(dx<-50&&curPage<pageIds.length-1)goToPage(curPage+1);
     else if(dx>50&&curPage>0)goToPage(curPage-1);
     else goToPage(curPage);
+  }
+
+  inner.addEventListener('touchend',e=>{
+    if(!isMobile())return;
+    endSwipe(e.changedTouches[0].clientX);
+  },{passive:true});
+
+  inner.addEventListener('touchcancel',()=>{
+    if(!isMobile())return;
+    dragging=false;
+    inner.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
+    inner.style.transform='translateX('+(-(curPage*100))+'%)';
   },{passive:true});
 
   // Resize handler
   let resizeT;
   window.addEventListener('resize',()=>{clearTimeout(resizeT);resizeT=setTimeout(()=>{
-    if(isMobile()){inner.style.display='flex';inner.style.transform='translateX(-'+(curPage*100)+'%)';}
+    if(isMobile()){inner.style.display='flex';inner.style.transform='translateX('+(-(curPage*100))+'%)';}
     else{inner.style.display='block';inner.style.transform='none';$$('.page').forEach(p=>p.classList.remove('active'));$(pageIds[curPage]).classList.add('active')}
   },100)});
 
@@ -893,7 +918,7 @@ function renderTimeline(){
 }
 
 // ===== FORECAST =====
-let fcOffset=0,fcRange=6;
+let fcOffset=0,fcRange=3;
 function renderForecast(){
   const cy=cY(),cm=cM(),{year,month}=addM(cy,cm,fcOffset);
   $('fcMonthLabel').textContent=mLabel(year,month);

@@ -403,7 +403,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 
     <!-- Mini Chart -->
     <div class="card" style="padding:16px 18px">
-      <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">残高推移</div>
+      <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">残高予測</div>
       <div style="height:80px" id="homeMiniChart"></div>
     </div>
   </div>
@@ -486,7 +486,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <!-- Chart -->
     <div class="card card-sm">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:.78rem;font-weight:600;color:var(--text2)">残高推移</span>
+        <span style="font-size:.78rem;font-weight:600;color:var(--text2)">残高予測</span>
         <div class="segment chart-range" style="margin:0;width:auto">
           <button class="seg-btn fc-range active" data-range="3">3ヶ月</button>
           <button class="seg-btn fc-range" data-range="6">6ヶ月</button>
@@ -990,19 +990,21 @@ function renderMiniChart(){
   const c=$('homeMiniChart'),fc=getForecast(4);
   if(!fc.length){c.innerHTML='<div class="empty" style="font-size:.72rem">データを入力してください</div>';return}
   const vals=fc.map(f=>f.balance),maxV=Math.max(...vals),minV=Math.min(...vals);
-  const range=maxV-minV||1,W=300,H=80,pad=4;
-  const pts=vals.map((v,i)=>{const x=i/(vals.length-1)*W;const y=pad+(1-(v-minV)/range)*(H-pad*2-15);return{x,y}});
+  const range=maxV-minV||1,W=300,H=80,padL=50,padR=4,padT=4,padB=15;
+  const pts=vals.map((v,i)=>{const x=padL+i/(vals.length-1)*(W-padL-padR);const y=padT+(1-(v-minV)/range)*(H-padT-padB);return{x,y}});
   let path='M'+pts.map(p=>p.x+','+p.y).join(' L');
-  let area=path+' L'+W+','+H+' L0,'+H+'Z';
+  let area=path+' L'+pts[pts.length-1].x+','+H+' L'+padL+','+H+'Z';
   let svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="100%" preserveAspectRatio="none">'
     +'<defs><linearGradient id="mcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(20,184,166,.12)"/><stop offset="100%" stop-color="rgba(20,184,166,0)"/></linearGradient></defs>'
+    +'<text x="'+(padL-4)+'" y="'+(padT+6)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)" text-anchor="end">'+fmtShort(maxV)+'</text>'
+    +'<text x="'+(padL-4)+'" y="'+(H-padB)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)" text-anchor="end">'+fmtShort(minV)+'</text>'
     +'<path d="'+area+'" fill="url(#mcg)"/>'
     +'<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
   pts.forEach((p,i)=>{
     const isLast=i===pts.length-1;
     svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="var(--accent)"'+(isLast?' stroke="#fff" stroke-width="2"':'')+'/>';
   });
-  fc.forEach((f,i)=>{const x=i/(fc.length-1)*W;svg+='<text x="'+Math.min(x,W-20)+'" y="'+(H-2)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)">'+f.month+'月</text>'});
+  fc.forEach((f,i)=>{const x=padL+i/(fc.length-1)*(W-padL-padR);svg+='<text x="'+x+'" y="'+(H-2)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)" text-anchor="middle">'+f.month+'月</text>'});
   svg+='</svg>';
   c.innerHTML=svg;
 }

@@ -351,6 +351,23 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 .grp-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 .cat-chip{display:flex;align-items:center;gap:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:.72rem;font-weight:500;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s}
 .cat-chip.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-head{text-align:center;font-size:.65rem;font-weight:600;color:var(--text3);padding:6px 0}
+.cal-cell{min-height:52px;padding:4px 2px;border-radius:var(--radius-xs);text-align:center;cursor:pointer;transition:background .15s}
+.cal-cell:active{background:var(--accent-soft)}
+.cal-cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.cal-cell.other-month{opacity:.3;cursor:default}
+.cal-cell.selected{background:var(--accent-soft)}
+.cal-day{font-size:.75rem;font-weight:500;font-family:var(--font-num);margin-bottom:2px}
+.cal-dots{display:flex;gap:3px;justify-content:center;flex-wrap:nowrap}
+.cal-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cal-plus{font-size:.55rem;font-weight:700;color:var(--text3);line-height:7px;display:flex;align-items:center}
+.cal-filter{padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.68rem;font-weight:600;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.cal-filter.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.cal-detail-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.cal-detail-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -561,7 +578,21 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
   </div>
 
-  <!-- Page 4: Settings -->
+  <!-- Page 4: Calendar -->
+  <div class="page" id="pageCalendar">
+    <div class="month-nav">
+      <button class="nav-btn" id="calPrev"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="month-label" id="calMonthLabel"></div>
+      <button class="nav-btn" id="calNext"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+    <div class="card card-sm" id="calSummary" style="text-align:center;margin-bottom:12px"></div>
+    <div id="calFilters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="calDetail" class="card card-sm" style="display:none;margin-top:12px"></div>
+    <div id="calLegend" style="display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;margin-top:14px;font-size:.68rem"></div>
+  </div>
+
+  <!-- Page 5: Settings -->
   <div class="page" id="pageSettings">
     <!-- Income -->
     <div class="card">
@@ -653,6 +684,10 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <span>予測</span>
   </button>
   <button class="tab-btn" data-idx="3">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>カレンダー</span>
+  </button>
+  <button class="tab-btn" data-idx="4">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     <span>設定</span>
   </button>
@@ -710,6 +745,14 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <div class="form-group">
       <label class="form-label">カテゴリ（任意）</label>
       <select class="form-select" id="fixedCatSelect" style="height:40px;font-size:.85rem"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">カレンダー分類（任意）</label>
+      <select class="form-select" id="fixedCalGroup" style="height:40px;font-size:.85rem"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">引き落とし日（任意）</label>
+      <input type="number" inputmode="numeric" class="form-input" id="fixedDueDay" placeholder="1〜31" min="1" max="31" style="height:40px;font-size:.85rem">
     </div>
     <div class="toggle-row">
       <span style="font-size:.88rem">ローンとして管理</span>
@@ -774,6 +817,16 @@ const SK = 'moneyflow_data';
 const GROUP_NAMES={1:'毎月の生活費',2:'不定期の支出'};
 function catColor(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.color:'#6B7280'}
 function catIcon(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.icon:'📦'}
+
+const CAL_GROUPS=[
+  {key:'rent',name:'家賃・管理費',color:'#E24B4A'},
+  {key:'loan',name:'ローン返済',color:'#BA7517'},
+  {key:'subscription',name:'サブスク',color:'#185FA5'},
+  {key:'utility',name:'光熱費・水道',color:'#1D9E75'},
+  {key:'other',name:'その他固定費',color:'#888780'}
+];
+function calGroupColor(key){const g=CAL_GROUPS.find(x=>x.key===key);return g?g.color:'#888780'}
+function calGroupName(key){const g=CAL_GROUPS.find(x=>x.key===key);return g?g.name:''}
 
 function defaultData(){
   return {
@@ -919,8 +972,8 @@ function autoCarryover(){
 const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
 // ===== NAVIGATION =====
-let curPage=0;const pageIds=['pageHome','pageRecord','pageForecast','pageSettings'];
-const renderFns=[renderHome,renderRecord,renderForecast,renderSettings];
+let curPage=0;const pageIds=['pageHome','pageRecord','pageForecast','pageCalendar','pageSettings'];
+const renderFns=[renderHome,renderRecord,renderForecast,renderCalendar,renderSettings];
 function isMobile(){return window.innerWidth<=640}
 
 function goToPage(idx){
@@ -1471,6 +1524,8 @@ function openFixedEdit(id){
   $('fixedAmt').value=item.amount||'';
   $('fixedRemain').value=item.remainingCount||'';
   populateFixedCatSelect(item.category||'');
+  populateCalGroupSelect(item.calendarGroup||'');
+  $('fixedDueDay').value=item.dueDay||'';
   if(item.isLoan){lt.classList.add('on');$('fixedLoanFields').style.display='block'}
   else{lt.classList.remove('on');$('fixedLoanFields').style.display='none'}
   showModal('modalFixed');
@@ -1478,20 +1533,158 @@ function openFixedEdit(id){
 function initFixedModal(){
   const lt=$('fixedLoanToggle');
   lt.addEventListener('click',()=>{lt.classList.toggle('on');$('fixedLoanFields').style.display=lt.classList.contains('on')?'block':'none'});
-  $('btnAddFixed').addEventListener('click',()=>{editingFixedId=null;$('fixedModalTitle').textContent='固定費を追加';$('fixedName').value='';$('fixedAmt').value='';$('fixedRemain').value='';populateFixedCatSelect('');lt.classList.remove('on');$('fixedLoanFields').style.display='none';showModal('modalFixed')});
+  $('btnAddFixed').addEventListener('click',()=>{editingFixedId=null;$('fixedModalTitle').textContent='固定費を追加';$('fixedName').value='';$('fixedAmt').value='';$('fixedRemain').value='';populateFixedCatSelect('');populateCalGroupSelect('');$('fixedDueDay').value='';lt.classList.remove('on');$('fixedLoanFields').style.display='none';showModal('modalFixed')});
   $('btnFixedSave').addEventListener('click',()=>{
     const name=$('fixedName').value.trim(),amt=clampAmt(parseFloat($('fixedAmt').value));
     if(!name)return alert('名称を入力');if(amt<=0)return alert('金額を入力');
     const isLoan=lt.classList.contains('on'),remain=isLoan?(+$('fixedRemain').value||0):0;
     const category=$('fixedCatSelect').value||'';
+    const calendarGroup=$('fixedCalGroup').value||'';
+    const dueDayVal=+$('fixedDueDay').value;
+    const dueDay=(dueDayVal>=1&&dueDayVal<=31)?dueDayVal:null;
     if(editingFixedId){
       const item=data.expenses.fixed.find(f=>f.id===editingFixedId);
-      if(item){item.name=name;item.amount=amt;item.isLoan=isLoan;item.remainingCount=remain;item.category=category}
+      if(item){item.name=name;item.amount=amt;item.isLoan=isLoan;item.remainingCount=remain;item.category=category;item.calendarGroup=calendarGroup;item.dueDay=dueDay}
     }else{
-      data.expenses.fixed.push({id:genId(),name,amount:amt,isLoan,remainingCount:remain,category,startDate:new Date().toISOString()});
+      data.expenses.fixed.push({id:genId(),name,amount:amt,isLoan,remainingCount:remain,category,calendarGroup,dueDay,startDate:new Date().toISOString()});
     }
     editingFixedId=null;saveNow();renderFixedList();hideModal('modalFixed');
   });
+}
+
+// ===== CALENDAR GROUP SELECT =====
+function populateCalGroupSelect(selected){
+  const sel=$('fixedCalGroup');sel.innerHTML='';
+  const none=document.createElement('option');none.value='';none.textContent='-- なし（カレンダー非表示）--';sel.appendChild(none);
+  CAL_GROUPS.forEach(g=>{const o=document.createElement('option');o.value=g.key;o.textContent=g.name;if(g.key===selected)o.selected=true;sel.appendChild(o)});
+}
+
+// ===== CALENDAR =====
+let calYear,calMonth,calSelectedDay=null,calFilter='all';
+function getCalendarItems(y,m){
+  const daysInMonth=new Date(y,m,0).getDate();
+  return data.expenses.fixed.filter(f=>{
+    if(!f.dueDay||!f.calendarGroup)return false;
+    if(f.isLoan&&f.remainingCount<=0)return false;
+    if(f.isLoan&&isLoanPaid(f,y,m))return false;
+    if(calFilter!=='all'&&f.calendarGroup!==calFilter)return false;
+    return true;
+  });
+}
+
+function renderCalendar(){
+  if(!calYear){calYear=cY();calMonth=cM()}
+  $('calMonthLabel').textContent=mLabel(calYear,calMonth);
+  const items=getCalendarItems(calYear,calMonth);
+  const daysInMonth=new Date(calYear,calMonth,0).getDate();
+
+  // Summary
+  let totalAmt=0;items.forEach(f=>{totalAmt+=f.amount||0});
+  $('calSummary').innerHTML='<div style="font-size:.72rem;color:var(--text3)">引き落とし予定</div>'
+    +'<div style="display:flex;justify-content:center;gap:16px;margin-top:4px">'
+    +'<span style="font-family:var(--font-num);font-size:1.1rem;font-weight:600;color:var(--red)">'+fmt(totalAmt)+'</span>'
+    +'<span style="font-size:.82rem;color:var(--text2)">'+items.length+'件</span></div>';
+
+  // Filters
+  renderCalFilters();
+
+  // Group items by actual day
+  const dayMap={};
+  items.forEach(f=>{
+    const actualDay=Math.min(f.dueDay,daysInMonth);
+    if(!dayMap[actualDay])dayMap[actualDay]=[];
+    dayMap[actualDay].push(f);
+  });
+
+  // Build grid
+  const grid=$('calGrid');
+  const firstDay=new Date(calYear,calMonth-1,1).getDay();
+  const prevDays=new Date(calYear,calMonth-1,0).getDate();
+  const today=now();
+  const isCurrentMonth=calYear===today.getFullYear()&&calMonth===today.getMonth()+1;
+  const todayDate=today.getDate();
+
+  let html='';
+  ['日','月','火','水','木','金','土'].forEach(d=>{html+='<div class="cal-head">'+d+'</div>'});
+
+  for(let i=0;i<firstDay;i++){html+='<div class="cal-cell other-month"><div class="cal-day">'+(prevDays-firstDay+1+i)+'</div></div>'}
+
+  for(let d=1;d<=daysInMonth;d++){
+    const cls='cal-cell'+(isCurrentMonth&&d===todayDate?' today':'')+(d===calSelectedDay?' selected':'');
+    html+='<div class="'+cls+'" data-day="'+d+'"><div class="cal-day">'+d+'</div>';
+    if(dayMap[d]){
+      html+='<div class="cal-dots">';
+      dayMap[d].slice(0,4).forEach(f=>{html+='<div class="cal-dot" style="background:'+calGroupColor(f.calendarGroup)+'"></div>'});
+      if(dayMap[d].length>4)html+='<span class="cal-plus">+</span>';
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+
+  const totalCells=firstDay+daysInMonth;
+  const remaining=totalCells%7===0?0:7-totalCells%7;
+  for(let i=1;i<=remaining;i++){html+='<div class="cal-cell other-month"><div class="cal-day">'+i+'</div></div>'}
+
+  grid.innerHTML=html;
+  grid.querySelectorAll('.cal-cell:not(.other-month)').forEach(cell=>{
+    cell.addEventListener('click',()=>{
+      const day=+cell.dataset.day;
+      calSelectedDay=calSelectedDay===day?null:day;
+      renderCalendar();
+    });
+  });
+
+  renderCalDetail(dayMap);
+  renderCalLegend();
+}
+
+function renderCalFilters(){
+  const c=$('calFilters');
+  let html='<button class="cal-filter'+(calFilter==='all'?' active':'')+'" data-filter="all">すべて</button>';
+  CAL_GROUPS.forEach(g=>{
+    html+='<button class="cal-filter'+(calFilter===g.key?' active':'')+'" data-filter="'+g.key+'">'
+      +'<span style="width:8px;height:8px;border-radius:50%;background:'+g.color+';flex-shrink:0"></span>'+g.name+'</button>';
+  });
+  c.innerHTML=html;
+  c.querySelectorAll('.cal-filter').forEach(b=>{
+    b.addEventListener('click',()=>{calFilter=b.dataset.filter;calSelectedDay=null;renderCalendar()});
+  });
+}
+
+function renderCalDetail(dayMap){
+  const c=$('calDetail');
+  if(!calSelectedDay||!dayMap[calSelectedDay]){c.style.display='none';return}
+  c.style.display='block';
+  const items=dayMap[calSelectedDay];
+  let total=0;
+  let html='<div style="font-size:.78rem;font-weight:700;margin-bottom:8px">'+calMonth+'/'+calSelectedDay+' の引き落とし</div>';
+  items.forEach(f=>{
+    const col=calGroupColor(f.calendarGroup);
+    html+='<div class="cal-detail-item">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+      +'<div style="flex:1;font-size:.85rem;font-weight:500">'+f.name+'</div>'
+      +'<div style="font-family:var(--font-num);font-size:.85rem;font-weight:600;color:var(--red)">'+fmt(f.amount)+'</div></div>';
+    total+=f.amount||0;
+  });
+  html+='<div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1.5px solid var(--border);margin-top:4px">'
+    +'<span style="font-size:.82rem;font-weight:600">合計</span>'
+    +'<span style="font-family:var(--font-num);font-size:.95rem;font-weight:700;color:var(--red)">'+fmt(total)+'</span></div>';
+  c.innerHTML=html;
+}
+
+function renderCalLegend(){
+  let html='';
+  CAL_GROUPS.forEach(g=>{
+    html+='<span style="display:flex;align-items:center;gap:4px">'
+      +'<span style="width:8px;height:8px;border-radius:50%;background:'+g.color+'"></span>'+g.name+'</span>';
+  });
+  $('calLegend').innerHTML=html;
+}
+
+function initCalendar(){
+  calYear=cY();calMonth=cM();
+  $('calPrev').addEventListener('click',()=>{const r=addM(calYear,calMonth,-1);calYear=r.year;calMonth=r.month;calSelectedDay=null;renderCalendar()});
+  $('calNext').addEventListener('click',()=>{const r=addM(calYear,calMonth,1);calYear=r.year;calMonth=r.month;calSelectedDay=null;renderCalendar()});
 }
 
 // ===== INPUT MODAL (FAB) =====
@@ -1702,7 +1895,7 @@ function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.registe
 // ===== INIT =====
 function init(){
   loadData();autoCarryover();
-  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initBudget();initForecast();initSettings();regSW();
+  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initBudget();initForecast();initCalendar();initSettings();regSW();
   goToPage(0);
   setTimeout(checkBudgetAlerts,2000);
 }

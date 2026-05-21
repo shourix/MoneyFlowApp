@@ -632,6 +632,13 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <button class="add-btn" id="btnAddFixed">+ 固定費を追加</button>
     </div>
 
+    <!-- Variable Expenses -->
+    <div class="card">
+      <div class="card-title">変動費（月の予算）</div>
+      <div id="varList"></div>
+      <button class="add-btn" id="btnAddVar">+ 変動費を追加</button>
+    </div>
+
     <!-- Theme & Data -->
     <div class="card">
       <div class="card-title">アプリ設定</div>
@@ -762,6 +769,27 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="form-group"><label class="form-label">残り回数</label><input type="number" inputmode="decimal" class="form-input" id="fixedRemain" placeholder="0" min="0"></div>
     </div>
     <button class="btn-primary" style="margin-top:8px" id="btnFixedSave">保存</button>
+  </div>
+</div>
+
+<!-- Variable Expense Modal -->
+<div class="modal-overlay" id="modalVar">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 style="font-size:1rem;margin-bottom:16px" id="varModalTitle">変動費を追加</h3>
+    <div class="form-group">
+      <label class="form-label">名称</label>
+      <input type="text" class="form-input" id="varName" placeholder="例: お昼">
+    </div>
+    <div class="form-group">
+      <label class="form-label">金額 (月額)</label>
+      <input type="number" inputmode="decimal" class="form-input" id="varAmt" placeholder="0" max="999900000000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">カテゴリ（任意）</label>
+      <select class="form-select" id="varCatSelect" style="height:40px;font-size:.85rem"></select>
+    </div>
+    <button class="btn-primary" style="margin-top:8px" id="btnVarSave">保存</button>
   </div>
 </div>
 
@@ -1430,7 +1458,7 @@ function renderSettings(){
   $('inpOT').value=data.income.overtimeHours||'';
   $('inpBonus').value=data.income.bonusAmount||'';
   $('inpSide').value=data.income.sideIncome||'';
-  updateDedDisplay();renderFixedList();
+  updateDedDisplay();renderFixedList();renderVarList();
 }
 
 function updateDedDisplay(){
@@ -1549,6 +1577,61 @@ function initFixedModal(){
       data.expenses.fixed.push({id:genId(),name,amount:amt,isLoan,remainingCount:remain,category,calendarGroup,dueDay,startDate:new Date().toISOString()});
     }
     editingFixedId=null;saveNow();renderFixedList();hideModal('modalFixed');
+  });
+}
+
+// ===== VARIABLE EXPENSES =====
+let varDragIdx=null,editingVarId=null;
+function renderVarList(){
+  const c=$('varList');c.innerHTML='';
+  data.expenses.variable.forEach((item,idx)=>{
+    const div=document.createElement('div');div.className='exp-item';div.draggable=true;div.dataset.idx=idx;
+    let meta='';
+    if(item.category)meta='<div class="exp-meta" style="color:var(--text3)">'+item.category+'</div>';
+    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-var-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'変動費')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-var-del="'+item.id+'">×</button>';
+    div.addEventListener('dragstart',()=>{varDragIdx=idx;div.classList.add('dragging')});
+    div.addEventListener('dragend',()=>{div.classList.remove('dragging');c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'))});
+    div.addEventListener('dragover',e=>{e.preventDefault();c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'));div.classList.add('drag-over')});
+    div.addEventListener('drop',e=>{e.preventDefault();const ti=+div.dataset.idx;if(varDragIdx!==null&&varDragIdx!==ti){const m=data.expenses.variable.splice(varDragIdx,1)[0];data.expenses.variable.splice(ti,0,m);saveNow();renderVarList()}varDragIdx=null});
+    const handle=div.querySelector('.exp-handle');
+    handle.addEventListener('touchstart',()=>{varDragIdx=idx;div.classList.add('dragging')},{passive:true});
+    handle.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0],el=document.elementFromPoint(t.clientX,t.clientY);c.querySelectorAll('.exp-item').forEach(x=>x.classList.remove('drag-over'));if(el){const item=el.closest('.exp-item');if(item&&item!==div)item.classList.add('drag-over')}},{passive:false});
+    handle.addEventListener('touchend',e=>{div.classList.remove('dragging');const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,t.clientY);if(el){const item=el.closest('.exp-item');if(item&&item!==div){const ti=+item.dataset.idx;if(varDragIdx!==null){const m=data.expenses.variable.splice(varDragIdx,1)[0];data.expenses.variable.splice(ti,0,m);saveNow();renderVarList()}}}c.querySelectorAll('.exp-item').forEach(x=>x.classList.remove('drag-over'));varDragIdx=null},{passive:true});
+    c.appendChild(div);
+  });
+  c.querySelectorAll('[data-var-del]').forEach(b=>{b.addEventListener('click',()=>{const item=data.expenses.variable.find(f=>f.id===b.dataset.varDel);if(item&&confirm('「'+item.name+'」を削除？')){data.expenses.variable=data.expenses.variable.filter(f=>f.id!==b.dataset.varDel);saveNow();renderVarList()}})});
+  c.querySelectorAll('[data-var-id]').forEach(b=>{b.addEventListener('click',()=>{openVarEdit(b.dataset.varId)})});
+}
+
+function populateVarCatSelect(selected){
+  const sel=$('varCatSelect');sel.innerHTML='';
+  const none=document.createElement('option');none.value='';none.textContent='-- なし --';sel.appendChild(none);
+  data.categories.forEach(c=>{const o=document.createElement('option');o.value=c.name;o.textContent=c.icon+' '+c.name;if(c.name===selected)o.selected=true;sel.appendChild(o)});
+}
+
+function openVarEdit(id){
+  const item=data.expenses.variable.find(f=>f.id===id);if(!item)return;
+  editingVarId=id;
+  $('varModalTitle').textContent='変動費を編集';
+  $('varName').value=item.name||'';
+  $('varAmt').value=item.amount||'';
+  populateVarCatSelect(item.category||'');
+  showModal('modalVar');
+}
+
+function initVarModal(){
+  $('btnAddVar').addEventListener('click',()=>{editingVarId=null;$('varModalTitle').textContent='変動費を追加';$('varName').value='';$('varAmt').value='';populateVarCatSelect('');showModal('modalVar')});
+  $('btnVarSave').addEventListener('click',()=>{
+    const name=$('varName').value.trim(),amt=clampAmt(parseFloat($('varAmt').value));
+    if(!name)return alert('名称を入力');if(amt<=0)return alert('金額を入力');
+    const category=$('varCatSelect').value||'';
+    if(editingVarId){
+      const item=data.expenses.variable.find(f=>f.id===editingVarId);
+      if(item){item.name=name;item.amount=amt;item.category=category}
+    }else{
+      data.expenses.variable.push({id:genId(),name,amount:amt,category});
+    }
+    editingVarId=null;saveNow();renderVarList();hideModal('modalVar');
   });
 }
 
@@ -1895,7 +1978,7 @@ function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.registe
 // ===== INIT =====
 function init(){
   loadData();autoCarryover();
-  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initBudget();initForecast();initCalendar();initSettings();regSW();
+  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initVarModal();initBudget();initForecast();initCalendar();initSettings();regSW();
   goToPage(0);
   setTimeout(checkBudgetAlerts,2000);
 }

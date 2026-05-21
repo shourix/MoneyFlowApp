@@ -465,7 +465,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
           <div style="text-align:center;font-family:var(--font-num);font-size:.95rem;color:var(--accent)" id="simOTResult">0h → ¥0</div>
           <div style="text-align:center;font-size:.65rem;color:var(--text3);margin-top:2px" id="simOTDesc">予想月収（現在との差額）</div>
           <div style="margin-top:16px;font-size:.78rem;font-weight:500;color:var(--text2);margin-bottom:4px">副業収入</div>
-          <input type="number" inputmode="decimal" class="form-input" id="simSide" placeholder="仮の副業収入" style="margin-bottom:6px">
+          <input type="number" inputmode="decimal" class="form-input" id="simSide" placeholder="仮の副業収入" style="margin-bottom:6px" max="999900000000">
           <div style="text-align:center;font-size:.85rem;color:var(--text2)">現在との差額: <span id="simSideResult" style="font-family:var(--font-num);color:var(--accent)">+¥0</span></div>
         </div>
       </div>
@@ -534,7 +534,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="card-title">給与設定</div>
       <div class="form-group">
         <label class="form-label">額面給与 (月額・税引前)</label>
-        <input type="number" inputmode="decimal" class="form-input" id="inpGross" placeholder="例: 300000">
+        <input type="number" inputmode="decimal" class="form-input" id="inpGross" placeholder="例: 300000" max="999900000000">
       </div>
       <div class="form-group">
         <label class="form-label">残業時間 (時間/月)</label>
@@ -552,11 +552,11 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="card-title">ボーナス・副業</div>
       <div class="form-group">
         <label class="form-label">ボーナス (1回・手取り / 4月・10月)</label>
-        <input type="number" inputmode="decimal" class="form-input" id="inpBonus" placeholder="0">
+        <input type="number" inputmode="decimal" class="form-input" id="inpBonus" placeholder="0" max="999900000000">
       </div>
       <div class="form-group">
         <label class="form-label">副業収入 (月額・手取り)</label>
-        <input type="number" inputmode="decimal" class="form-input" id="inpSide" placeholder="0">
+        <input type="number" inputmode="decimal" class="form-input" id="inpSide" placeholder="0" max="999900000000">
       </div>
     </div>
 
@@ -633,7 +633,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">支出を記録</h3>
     <div class="form-group">
-      <input type="number" inputmode="decimal" class="form-input" id="inpSpendAmt" placeholder="金額" style="font-size:1.3rem;height:56px;text-align:center">
+      <input type="number" inputmode="decimal" class="form-input" id="inpSpendAmt" placeholder="金額" style="font-size:1.3rem;height:56px;text-align:center" max="999900000000">
     </div>
     <div class="form-group">
       <select class="form-select" id="inpSpendCat"></select>
@@ -651,7 +651,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">残高を編集</h3>
     <div class="form-group">
-      <input type="number" inputmode="decimal" class="form-input" id="inpBalance" placeholder="0">
+      <input type="number" inputmode="decimal" class="form-input" id="inpBalance" placeholder="0" max="999900000000">
     </div>
     <button class="btn-primary" id="btnBalanceSave">保存</button>
   </div>
@@ -668,7 +668,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
     <div class="form-group">
       <label class="form-label">金額 (月額)</label>
-      <input type="number" inputmode="decimal" class="form-input" id="fixedAmt" placeholder="0">
+      <input type="number" inputmode="decimal" class="form-input" id="fixedAmt" placeholder="0" max="999900000000">
     </div>
     <div class="toggle-row">
       <span style="font-size:.88rem">ローンとして管理</span>
@@ -733,7 +733,10 @@ function saveNow(){localStorage.setItem(SK,JSON.stringify(data))}
 // ===== UTIL =====
 function fmt(n){if(n==null||isNaN(n))return'¥0';const neg=n<0;return(neg?'-':'')+'¥'+Math.round(Math.abs(n)).toLocaleString('ja-JP')}
 function fmtS(n){return n>0?'+'+fmt(n):fmt(n)}
-function fmtShort(n){const a=Math.abs(n);if(a>=1e7)return(n<0?'-':'')+(a/1e7).toFixed(1)+'千万';if(a>=1e4)return(n<0?'-':'')+(a/1e4).toFixed(0)+'万';return(n<0?'-':'')+a.toLocaleString('ja-JP')}
+function fmtShort(n){const a=Math.abs(n),s=n<0?'-':'';if(a>=1e8)return s+(a/1e8).toFixed(a>=1e9?0:1)+'億';if(a>=1e7)return s+(a/1e7).toFixed(1)+'千万';if(a>=1e4)return s+(a/1e4).toFixed(0)+'万';return s+a.toLocaleString('ja-JP')}
+const MAX_AMOUNT=999900000000;
+function clampAmt(n){return Math.max(-MAX_AMOUNT,Math.min(MAX_AMOUNT,n||0))}
+function fitText(el,text,base,min){el.textContent=text;var len=text.length;if(len>10)el.style.fontSize=Math.max(min,base*(10/len))+'rem';else el.style.fontSize=base+'rem'}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function now(){return new Date()}
 function cY(){return now().getFullYear()}
@@ -918,16 +921,16 @@ function renderHome(){
   $('headerMonth').textContent=cM()+'月';
   const b=data.balance.current||0,cy=cY(),cm=cM();
   const inc=getIncome(cy,cm),exp=getExpense(cy,cm),net=inc-exp;
-  $('homeBalance').textContent=fmt(b);$('homeBalance').className='card-value '+(b>=0?'positive':'negative');
-  $('homeIncome').textContent=fmt(inc);$('homeExpense').textContent=fmt(exp);
-  $('homeNet').textContent=fmtS(net);$('homeNet').className='summary-val '+(net>=0?'positive':'negative');
+  fitText($('homeBalance'),fmt(b),1.6,0.9);$('homeBalance').className='card-value '+(b>=0?'positive':'negative');
+  fitText($('homeIncome'),fmt(inc),1.0,0.6);fitText($('homeExpense'),fmt(exp),1.0,0.6);
+  fitText($('homeNet'),fmtS(net),1.0,0.6);$('homeNet').className='summary-val '+(net>=0?'positive':'negative');
 
   // Daily budget
   const byCat=getSpendingByCat(),daysLeft=getDaysLeft();
   let totalBudget=0,totalSpent=0;
   Object.values(byCat).forEach(v=>{totalBudget+=v.budget;totalSpent+=v.spent});
   const remaining=totalBudget-totalSpent,daily=remaining>0?Math.floor(remaining/daysLeft):0;
-  $('homeDailyBudget').textContent=fmt(daily);
+  fitText($('homeDailyBudget'),fmt(daily),2.4,1.2);
   $('homeDailySub').textContent='残り'+daysLeft+'日 / 予算残 '+fmt(remaining);
 
   // Pace indicator
@@ -1042,11 +1045,11 @@ function renderForecast(){
   $('fcOffsetLabel').textContent=fcOffset===0?'今月':fcOffset+'ヶ月後';
   const fc=getForecast(fcOffset+1);
   const bal=fc.length>0?fc[fc.length-1].balance:data.balance.current;
-  $('fcBalance').textContent=fmt(bal);$('fcBalance').className='card-value '+(bal>=0?'positive':'negative');
+  fitText($('fcBalance'),fmt(bal),2.2,1.0);$('fcBalance').className='card-value '+(bal>=0?'positive':'negative');
 
   const inc=getIncome(year,month),exp=getExpense(year,month),net=inc-exp;
-  $('fcIncome').textContent=fmt(inc);$('fcExpense').textContent=fmt(exp);
-  $('fcNet').textContent=fmtS(net);$('fcNet').className='summary-val '+(net>=0?'positive':'negative');
+  fitText($('fcIncome'),fmt(inc),1.0,0.6);fitText($('fcExpense'),fmt(exp),1.0,0.6);
+  fitText($('fcNet'),fmtS(net),1.0,0.6);$('fcNet').className='summary-val '+(net>=0?'positive':'negative');
 
   // Breakdown
   const incItems=getIncomeBreakdown(year,month),expItems=[];
@@ -1088,7 +1091,7 @@ function updateSimOT(){
   renderFcChart(h,parseFloat($('simSide').value)||undefined);
 }
 function updateSimSide(){
-  const s=parseFloat($('simSide').value)||0,diff=s-(data.income.sideIncome||0);
+  const s=clampAmt(parseFloat($('simSide').value)),diff=s-(data.income.sideIncome||0);
   $('simSideResult').textContent=fmtS(diff);
   renderFcChart(+$('simOT').value||undefined,isNaN(parseFloat($('simSide').value))?undefined:parseFloat($('simSide').value));
 }
@@ -1165,7 +1168,7 @@ function renderDonut(){
   const byCat=getSpendingByCat(),svg=$('donutChart');svg.innerHTML='';
   let total=0;const items=[];
   Object.entries(byCat).forEach(([name,info])=>{if(info.spent>0){items.push({name,amount:info.spent,color:catColor(name)});total+=info.spent}});
-  $('donutTotal').textContent=fmt(total);
+  fitText($('donutTotal'),fmt(total),1.0,0.6);
   if(!total){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx','70');c.setAttribute('cy','70');c.setAttribute('r','50');c.setAttribute('fill','none');c.setAttribute('stroke','var(--bg)');c.setAttribute('stroke-width','14');svg.appendChild(c);$('donutLegend').innerHTML='';return}
   const cx=70,cy=70,r=50,circ=2*Math.PI*r;let off=0;
   items.forEach(i=>{const pct=i.amount/total,dl=pct*circ;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);c.setAttribute('fill','none');c.setAttribute('stroke',i.color);c.setAttribute('stroke-width','14');c.setAttribute('stroke-dasharray',dl+' '+(circ-dl));c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 70 70)');svg.appendChild(c);off+=dl});
@@ -1189,14 +1192,14 @@ function updateDedDisplay(){
   if(!g){c.innerHTML='';$('netDisplay').textContent='¥0';return}
   const lines=[{l:'健康保険',v:-d.health},{l:'厚生年金',v:-d.pension},{l:'雇用保険',v:-d.employ},{l:'所得税',v:-d.income},{l:'住民税(都内)',v:-d.resident}];
   let h='';lines.forEach(x=>{h+='<div class="ded-line"><span class="lbl">'+x.l+'</span><span class="val" style="color:var(--red)">'+fmt(x.v)+'</span></div>'});
-  c.innerHTML=h;$('netDisplay').textContent=fmt(d.net);
+  c.innerHTML=h;fitText($('netDisplay'),fmt(d.net),1.2,0.75);
 }
 
 function initSettings(){
-  $('inpGross').addEventListener('input',e=>{data.income.baseSalary=parseFloat(e.target.value)||0;updateDedDisplay();saveData()});
+  $('inpGross').addEventListener('input',e=>{data.income.baseSalary=clampAmt(parseFloat(e.target.value));updateDedDisplay();saveData()});
   $('inpOT').addEventListener('input',e=>{data.income.overtimeHours=parseFloat(e.target.value)||0;updateDedDisplay();saveData()});
-  $('inpBonus').addEventListener('input',e=>{data.income.bonusAmount=parseFloat(e.target.value)||0;saveData()});
-  $('inpSide').addEventListener('input',e=>{data.income.sideIncome=parseFloat(e.target.value)||0;saveData()});
+  $('inpBonus').addEventListener('input',e=>{data.income.bonusAmount=clampAmt(parseFloat(e.target.value));saveData()});
+  $('inpSide').addEventListener('input',e=>{data.income.sideIncome=clampAmt(parseFloat(e.target.value));saveData()});
 
   // Dark mode
   const t=$('toggleDark');
@@ -1275,7 +1278,7 @@ function initFixedModal(){
   lt.addEventListener('click',()=>{lt.classList.toggle('on');$('fixedLoanFields').style.display=lt.classList.contains('on')?'block':'none'});
   $('btnAddFixed').addEventListener('click',()=>{editingFixedId=null;$('fixedModalTitle').textContent='固定費を追加';$('fixedName').value='';$('fixedAmt').value='';$('fixedRemain').value='';lt.classList.remove('on');$('fixedLoanFields').style.display='none';showModal('modalFixed')});
   $('btnFixedSave').addEventListener('click',()=>{
-    const name=$('fixedName').value.trim(),amt=parseFloat($('fixedAmt').value)||0;
+    const name=$('fixedName').value.trim(),amt=clampAmt(parseFloat($('fixedAmt').value));
     if(!name)return alert('名称を入力');if(amt<=0)return alert('金額を入力');
     const isLoan=lt.classList.contains('on'),remain=isLoan?(+$('fixedRemain').value||0):0;
     if(editingFixedId){
@@ -1299,7 +1302,7 @@ function initInput(){
     setTimeout(()=>$('inpSpendAmt').focus(),300);
   });
   $('btnSpendSave').addEventListener('click',()=>{
-    const amt=parseFloat($('inpSpendAmt').value);if(!amt||amt<=0)return $('inpSpendAmt').focus();
+    const amt=clampAmt(parseFloat($('inpSpendAmt').value));if(!amt||amt<=0)return $('inpSpendAmt').focus();
     data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:$('inpSpendCat').value,memo:$('inpSpendMemo').value.trim()});
     saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===1)renderRecord();checkBudgetAlerts();
   });
@@ -1309,19 +1312,19 @@ function initInput(){
 // ===== BALANCE MODAL =====
 function initBalance(){
   $('btnEditBalance').addEventListener('click',()=>{$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
-  $('btnBalanceSave').addEventListener('click',()=>{data.balance.current=parseFloat($('inpBalance').value)||0;data.balance.lastUpdated=cY()+'-'+String(cM()).padStart(2,'0');saveNow();renderHome();hideModal('modalBalance')});
+  $('btnBalanceSave').addEventListener('click',()=>{data.balance.current=clampAmt(parseFloat($('inpBalance').value));data.balance.lastUpdated=cY()+'-'+String(cM()).padStart(2,'0');saveNow();renderHome();hideModal('modalBalance')});
 }
 
 // ===== BUDGET MODAL =====
 function initBudget(){
   $('btnEditBudgets').addEventListener('click',()=>{renderBudgetEdit();showModal('modalBudget')});
   $('btnAddCat').addEventListener('click',()=>{const n=$('newCatName').value.trim();if(!n)return;if(data.budgets.some(b=>b.name===n))return alert('同名カテゴリあり');data.budgets.push({id:genId(),name:n,amount:0});$('newCatName').value='';renderBudgetEdit()});
-  $('btnBudgetSave').addEventListener('click',()=>{$$('#budgetEditList .be-amt').forEach(inp=>{const b=data.budgets.find(x=>x.id===inp.dataset.id);if(b)b.amount=parseFloat(inp.value)||0});saveNow();renderRecord();hideModal('modalBudget')});
+  $('btnBudgetSave').addEventListener('click',()=>{$$('#budgetEditList .be-amt').forEach(inp=>{const b=data.budgets.find(x=>x.id===inp.dataset.id);if(b)b.amount=clampAmt(parseFloat(inp.value))});saveNow();renderRecord();hideModal('modalBudget')});
 }
 function renderBudgetEdit(){
   const c=$('budgetEditList');c.innerHTML='';
   data.budgets.forEach(b=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px';
-  d.innerHTML='<span style="flex:1;font-size:.88rem">'+b.name+'</span><input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" style="width:130px;height:40px;font-size:.88rem"><button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
+  d.innerHTML='<span style="flex:1;font-size:.88rem">'+b.name+'</span><input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" max="999900000000" style="width:130px;height:40px;font-size:.88rem"><button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
   c.appendChild(d)});
   c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{if(confirm('カテゴリ「'+data.budgets.find(b=>b.id===btn.dataset.id)?.name+'」を削除？')){data.budgets=data.budgets.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
 }

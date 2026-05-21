@@ -725,6 +725,32 @@ font-size:.75rem;font-weight:600;transition:all .2s;
   </div>
 </div>
 
+<!-- Spending Edit Modal -->
+<div class="modal-overlay" id="modalSpendEdit">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 style="font-size:1rem;margin-bottom:16px">支出を編集</h3>
+    <div class="form-group">
+      <label class="form-label">金額</label>
+      <input type="number" inputmode="decimal" class="form-input" id="editSpendAmt" placeholder="金額" style="font-size:1.1rem;height:50px;text-align:center" max="999900000000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">カテゴリ</label>
+      <select class="form-select" id="editSpendCat"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ</label>
+      <input type="text" class="form-input" id="editSpendMemo" placeholder="メモ（任意）" style="height:44px;font-size:.88rem">
+    </div>
+    <div class="form-group">
+      <label class="form-label">日付</label>
+      <input type="date" class="form-input" id="editSpendDate" style="height:44px;font-size:.88rem">
+    </div>
+    <button class="btn-primary" id="btnSpendEditSave">保存</button>
+    <button id="btnSpendEditDelete" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;margin-top:8px;border:1.5px solid var(--red);border-radius:var(--radius-sm);background:var(--red-soft);color:var(--red);font-size:.85rem;font-weight:600;cursor:pointer">削除する</button>
+  </div>
+</div>
+
 <script>
 (function(){
 'use strict';
@@ -1060,13 +1086,16 @@ function renderTimeline(containerId,emptyId){
     items.forEach(s=>{
       const d=new Date(s.date),time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
       const col=catColor(s.category);
-      html+='<div class="timeline-item"><div class="tl-cat" style="background:'+col+'">'+s.category.charAt(0)+'</div>';
+      html+='<div class="timeline-item" data-spend-id="'+s.id+'" style="cursor:pointer"><div class="tl-cat" style="background:'+col+'">'+s.category.charAt(0)+'</div>';
       html+='<div class="tl-body"><div class="tl-memo">'+(s.memo||s.category)+'</div><div class="tl-time">'+time+'</div></div>';
       html+='<div class="tl-amount">'+fmt(s.amount)+'</div></div>';
     });
     html+='</div>';
   });
   c.innerHTML=html;
+  c.querySelectorAll('.timeline-item[data-spend-id]').forEach(el=>{
+    el.addEventListener('click',()=>openSpendEdit(el.dataset.spendId));
+  });
 }
 
 // ===== FORECAST =====
@@ -1412,6 +1441,46 @@ function initInput(){
   $('inpSpendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSpendSave').click()});
 }
 
+// ===== SPENDING EDIT =====
+let editingSpendId=null;
+function openSpendEdit(id){
+  const s=data.spending.find(x=>x.id===id);
+  if(!s)return;
+  editingSpendId=id;
+  $('editSpendAmt').value=s.amount||'';
+  $('editSpendMemo').value=s.memo||'';
+  const d=new Date(s.date);
+  $('editSpendDate').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const sel=$('editSpendCat');sel.innerHTML='';
+  data.budgets.forEach(b=>{const o=document.createElement('option');o.value=b.name;o.textContent=b.name;if(b.name===s.category)o.selected=true;sel.appendChild(o)});
+  showModal('modalSpendEdit');
+}
+function initSpendEdit(){
+  $('btnSpendEditSave').addEventListener('click',()=>{
+    const s=data.spending.find(x=>x.id===editingSpendId);
+    if(!s)return;
+    const amt=clampAmt(parseFloat($('editSpendAmt').value));if(!amt||amt<=0)return $('editSpendAmt').focus();
+    s.amount=amt;
+    s.category=$('editSpendCat').value;
+    s.memo=$('editSpendMemo').value.trim();
+    const dateVal=$('editSpendDate').value;
+    if(dateVal){
+      const old=new Date(s.date);
+      const parts=dateVal.split('-');
+      const nd=new Date(+parts[0],+parts[1]-1,+parts[2],old.getHours(),old.getMinutes(),old.getSeconds());
+      s.date=nd.toISOString();
+    }
+    saveNow();hideModal('modalSpendEdit');
+    if(curPage===0)renderHome();if(curPage===1)renderRecord();
+  });
+  $('btnSpendEditDelete').addEventListener('click',()=>{
+    if(!confirm('この支出を削除しますか？'))return;
+    data.spending=data.spending.filter(x=>x.id!==editingSpendId);
+    saveNow();hideModal('modalSpendEdit');
+    if(curPage===0)renderHome();if(curPage===1)renderRecord();
+  });
+}
+
 // ===== BALANCE MODAL =====
 function initBalance(){
   $('btnEditBalance').addEventListener('click',()=>{$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
@@ -1517,7 +1586,7 @@ function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.registe
 // ===== INIT =====
 function init(){
   loadData();autoCarryover();
-  initNav();initCollapse();initInput();initBalance();initFixedModal();initBudget();initForecast();initSettings();regSW();
+  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initBudget();initForecast();initSettings();regSW();
   goToPage(0);
   setTimeout(checkBudgetAlerts,2000);
 }

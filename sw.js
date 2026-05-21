@@ -1,7 +1,8 @@
-const CACHE_NAME = 'moneyflow-v2';
+const CACHE_NAME = 'moneyflow-v3';
 const ASSETS = [
   './',
   './index.html',
+  './privacy.html',
   './manifest.json',
   './icon-192.png'
 ];

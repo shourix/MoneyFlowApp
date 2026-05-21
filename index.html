@@ -588,8 +588,14 @@ font-size:.75rem;font-weight:600;transition:all .2s;
         </div>
         <input type="file" id="fileImport" accept=".json" style="display:none">
       </div>
-      <div style="margin-top:16px;text-align:center">
-        <a href="privacy.html" target="_blank" style="font-size:.78rem;color:var(--text3);text-decoration:underline">プライバシーポリシー</a>
+      <div style="margin-top:12px">
+        <button id="btnAppUpdate" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          アプリを更新する
+        </button>
+      </div>
+      <div style="margin-top:12px;text-align:center">
+        <a href="privacy.html" style="font-size:.78rem;color:var(--text3);text-decoration:underline">プライバシーポリシー</a>
       </div>
     </div>
   </div>
@@ -1214,6 +1220,16 @@ function initSettings(){
   $('btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='moneyflow_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u)});
   $('btnImport').addEventListener('click',()=>$('fileImport').click());
   $('fileImport').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const im=JSON.parse(ev.target.result);if(!im.income||!im.expenses)return alert('無効なファイル');if(!confirm('データを上書きしますか？'))return;data=Object.assign(defaultData(),im);data.income=Object.assign(defaultData().income,im.income||{});data.expenses=Object.assign(defaultData().expenses,im.expenses||{});data.balance=Object.assign(defaultData().balance,im.balance||{});data.settings=Object.assign(defaultData().settings,im.settings||{});if(Array.isArray(im.budgets))data.budgets=im.budgets;if(Array.isArray(im.spending))data.spending=im.spending;if(im.spendingArchive)data.spendingArchive=im.spendingArchive;saveNow();goToPage(0);alert('インポート完了')}catch(err){alert('エラー: '+err.message)}};r.readAsText(f);e.target.value=''});
+
+  // App update
+  $('btnAppUpdate').addEventListener('click',async()=>{
+    if('serviceWorker' in navigator){
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg){await reg.unregister()}
+      if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)))}
+    }
+    location.reload(true);
+  });
 }
 
 // ===== FIXED EXPENSES =====

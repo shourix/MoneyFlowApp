@@ -483,17 +483,24 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       </div>
     </div>
 
-    <!-- Chart -->
+    <!-- Chart (collapsible) -->
     <div class="card card-sm">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:.78rem;font-weight:600;color:var(--text2)">残高予測</span>
-        <div class="segment chart-range" style="margin:0;width:auto">
-          <button class="seg-btn fc-range active" data-range="3">3ヶ月</button>
-          <button class="seg-btn fc-range" data-range="6">6ヶ月</button>
-          <button class="seg-btn fc-range" data-range="12">12ヶ月</button>
+      <div class="collapse-header" data-target="fcChartBody">
+        <h3>残高予測</h3>
+        <svg class="collapse-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="collapse-body" id="fcChartBody">
+        <div style="padding-top:8px">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <div class="segment chart-range" style="margin:0;width:auto">
+              <button class="seg-btn fc-range active" data-range="3">3ヶ月</button>
+              <button class="seg-btn fc-range" data-range="6">6ヶ月</button>
+              <button class="seg-btn fc-range" data-range="12">12ヶ月</button>
+            </div>
+          </div>
+          <div class="chart-container" id="fcChart"></div>
         </div>
       </div>
-      <div class="chart-container" id="fcChart"></div>
     </div>
 
     <!-- Simulator (collapsible) -->

@@ -139,7 +139,7 @@ margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.03);
 .tl-cat{
 width:36px;height:36px;border-radius:10px;flex-shrink:0;
 display:flex;align-items:center;justify-content:center;
-font-size:.65rem;font-weight:700;color:#fff;
+font-size:.9rem;font-weight:700;color:#fff;
 }
 .tl-body{flex:1;min-width:0}
 .tl-memo{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -347,6 +347,10 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px;opacity:.3}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.grp-btn{padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.7rem;font-weight:600;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s}
+.grp-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.cat-chip{display:flex;align-items:center;gap:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:.72rem;font-weight:500;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s}
+.cat-chip.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 </style>
 </head>
 <body>
@@ -636,7 +640,10 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <input type="number" inputmode="decimal" class="form-input" id="inpSpendAmt" placeholder="金額" style="font-size:1.3rem;height:56px;text-align:center" max="999900000000">
     </div>
     <div class="form-group">
-      <select class="form-select" id="inpSpendCat"></select>
+      <label class="form-label" style="font-size:.72rem;margin-bottom:6px">カテゴリ</label>
+      <div id="inpGroupBtns" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap"></div>
+      <div id="inpCatGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <input type="hidden" id="inpSpendCat">
     </div>
     <div class="form-group">
       <input type="text" class="form-input" id="inpSpendMemo" placeholder="メモ（任意）" style="height:44px;font-size:.88rem">
@@ -685,8 +692,9 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 <div class="modal-overlay" id="modalBudget">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:16px">カテゴリ予算を編集</h3>
-    <div id="budgetEditList"></div>
+    <h3 style="font-size:1rem;margin-bottom:12px">カテゴリ予算を編集</h3>
+    <div id="budgetGroupTabs" style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap"></div>
+    <div id="budgetEditList" style="max-height:320px;overflow-y:auto"></div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <input type="text" class="form-input" id="newCatName" placeholder="新しいカテゴリ名" style="flex:1;height:40px;font-size:.85rem">
       <button class="btn-secondary" id="btnAddCat" style="height:40px;padding:0 14px">追加</button>
@@ -701,17 +709,41 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 
 // ===== DATA =====
 const SK = 'moneyflow_data';
-const CAT_COLORS = {'朝食代':'#F59E0B','昼食代':'#EF4444','夕飯代':'#8B5CF6','日用品':'#3B82F6','交際費':'#EC4899','美容':'#14B8A6','交通費':'#6366F1','通信費':'#10B981','娯楽':'#F97316','医療':'#06B6D4','教育':'#84CC16','その他':'#6B7280'};
-function catColor(c){return CAT_COLORS[c]||'#6B7280'}
+const GROUP_NAMES={1:'毎月の固定費',2:'毎月の変動費',3:'不定期の固定費',4:'不定期の変動費'};
+function catColor(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.color:'#6B7280'}
+function catIcon(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.icon:'📦'}
 
 function defaultData(){
   return {
     income:{baseSalary:0,overtimeRate:2273,overtimeHours:0,bonusAmount:0,bonusMonths:[4,10],sideIncome:0},
     expenses:{fixed:[],variable:[]},
     balance:{current:0,lastUpdated:null},
-    budgets:[
-      {id:'b1',name:'朝食代',amount:0},{id:'b2',name:'昼食代',amount:0},{id:'b3',name:'夕飯代',amount:0},
-      {id:'b4',name:'日用品',amount:0},{id:'b5',name:'交際費',amount:0},{id:'b6',name:'美容',amount:0},{id:'b7',name:'その他',amount:0}
+    categories:[
+      {id:'c01',group:1,name:'家賃・管理費',amount:0,icon:'🏠',color:'#6366F1'},
+      {id:'c02',group:1,name:'通信費',amount:0,icon:'📱',color:'#3B82F6'},
+      {id:'c03',group:1,name:'サブスク（必須）',amount:0,icon:'🔒',color:'#8B5CF6'},
+      {id:'c04',group:1,name:'サブスク（その他）',amount:0,icon:'📺',color:'#A78BFA'},
+      {id:'c05',group:1,name:'保険料',amount:0,icon:'🛡',color:'#0EA5E9'},
+      {id:'c06',group:1,name:'ローン返済',amount:0,icon:'🏦',color:'#0284C7'},
+      {id:'c07',group:2,name:'食費・日用品',amount:0,icon:'🛒',color:'#F59E0B'},
+      {id:'c08',group:2,name:'外食',amount:0,icon:'🍽',color:'#EF4444'},
+      {id:'c09',group:2,name:'コンビニ',amount:0,icon:'🏪',color:'#F97316'},
+      {id:'c10',group:2,name:'光熱費・水道',amount:0,icon:'💡',color:'#10B981'},
+      {id:'c11',group:2,name:'美容・理容',amount:0,icon:'💇',color:'#EC4899'},
+      {id:'c12',group:2,name:'交通費',amount:0,icon:'🚃',color:'#14B8A6'},
+      {id:'c13',group:2,name:'交際費',amount:0,icon:'🎉',color:'#E11D48'},
+      {id:'c14',group:2,name:'副業関連費',amount:0,icon:'💼',color:'#7C3AED'},
+      {id:'c15',group:3,name:'年会費',amount:0,icon:'📋',color:'#64748B'},
+      {id:'c16',group:3,name:'保険料（年払い）',amount:0,icon:'📄',color:'#475569'},
+      {id:'c17',group:3,name:'税金',amount:0,icon:'🏛',color:'#DC2626'},
+      {id:'c18',group:3,name:'年払いサブスク',amount:0,icon:'📅',color:'#9333EA'},
+      {id:'c19',group:4,name:'医療・薬',amount:0,icon:'🏥',color:'#06B6D4'},
+      {id:'c20',group:4,name:'衣服',amount:0,icon:'👕',color:'#D946EF'},
+      {id:'c21',group:4,name:'家電・デジタル製品',amount:0,icon:'🖥',color:'#2563EB'},
+      {id:'c22',group:4,name:'旅行',amount:0,icon:'✈️',color:'#0891B2'},
+      {id:'c23',group:4,name:'冠婚葬祭・イベント',amount:0,icon:'💐',color:'#BE185D'},
+      {id:'c24',group:4,name:'趣味・娯楽',amount:0,icon:'🎮',color:'#EA580C'},
+      {id:'c25',group:4,name:'その他',amount:0,icon:'📦',color:'#6B7280'}
     ],
     spending:[],spendingArchive:{},
     settings:{darkMode:false,notifications:false}
@@ -723,7 +755,18 @@ function loadData(){
   try{
     const raw=localStorage.getItem(SK);
     if(raw){const p=JSON.parse(raw);data=Object.assign(defaultData(),p);data.income=Object.assign(defaultData().income,p.income||{});data.expenses=Object.assign(defaultData().expenses,p.expenses||{});data.balance=Object.assign(defaultData().balance,p.balance||{});data.settings=Object.assign(defaultData().settings,p.settings||{});
-    if(!Array.isArray(data.expenses.fixed))data.expenses.fixed=[];if(!Array.isArray(data.expenses.variable))data.expenses.variable=[];if(!Array.isArray(data.income.bonusMonths))data.income.bonusMonths=[4,10];if(!Array.isArray(data.budgets))data.budgets=defaultData().budgets;if(!Array.isArray(data.spending))data.spending=[];if(!data.spendingArchive||typeof data.spendingArchive!=='object')data.spendingArchive={};
+    if(!Array.isArray(data.expenses.fixed))data.expenses.fixed=[];if(!Array.isArray(data.expenses.variable))data.expenses.variable=[];if(!Array.isArray(data.income.bonusMonths))data.income.bonusMonths=[4,10];if(!Array.isArray(data.spending))data.spending=[];if(!data.spendingArchive||typeof data.spendingArchive!=='object')data.spendingArchive={};
+    // Migrate old budgets to categories
+    if(Array.isArray(p.budgets)&&!Array.isArray(p.categories)){
+      const def=defaultData().categories;
+      p.budgets.forEach(b=>{
+        const existing=def.find(c=>c.name===b.name);
+        if(existing){existing.amount=b.amount||0}
+        else{def.push({id:b.id||genId(),group:4,name:b.name,amount:b.amount||0,icon:'📦',color:'#6B7280'})}
+      });
+      data.categories=def;delete data.budgets;saveNow();
+    }
+    if(!Array.isArray(data.categories))data.categories=defaultData().categories;
     }else{data=defaultData()}
   }catch(e){data=defaultData()}
 }
@@ -785,7 +828,7 @@ function getForecast(months,otOv,sideOv,useAct){
   for(let i=0;i<months;i++){const{year,month}=addM(cy,cm,i);const inc=getIncome(year,month,i===0?otOv:undefined,i===0?sideOv:undefined);const exp=getExpense(year,month,useAct&&i===0);b+=inc-exp;r.push({year,month,income:inc,expense:exp,net:inc-exp,balance:b})}
   return r;
 }
-function getSpendingByCat(){const r={};data.budgets.forEach(b=>{r[b.name]={budget:b.amount||0,spent:0}});data.spending.forEach(s=>{if(!r[s.category])r[s.category]={budget:0,spent:0};r[s.category].spent+=s.amount||0});return r}
+function getSpendingByCat(){const r={};data.categories.forEach(c=>{r[c.name]={budget:c.amount||0,spent:0,group:c.group}});data.spending.forEach(s=>{if(!r[s.category])r[s.category]={budget:0,spent:0,group:4};r[s.category].spent+=s.amount||0});return r}
 function getDaysLeft(){const n=now(),last=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();return Math.max(1,last-n.getDate()+1)}
 function getTotalSpending(){return data.spending.reduce((s,i)=>s+(i.amount||0),0)}
 
@@ -1029,8 +1072,8 @@ function renderTimeline(containerId,emptyId){
     html+='<div class="timeline-day"><div class="timeline-date">'+label+'</div>';
     items.forEach(s=>{
       const d=new Date(s.date),time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-      const col=catColor(s.category);
-      html+='<div class="timeline-item"><div class="tl-cat" style="background:'+col+'">'+s.category.charAt(0)+'</div>';
+      const col=catColor(s.category),ico=catIcon(s.category);
+      html+='<div class="timeline-item"><div class="tl-cat" style="background:'+col+'">'+ico+'</div>';
       html+='<div class="tl-body"><div class="tl-memo">'+(s.memo||s.category)+'</div><div class="tl-time">'+time+'</div></div>';
       html+='<div class="tl-amount">'+fmt(s.amount)+'</div></div>';
     });
@@ -1152,14 +1195,23 @@ function renderRecord(){
   $('analysisMonth').textContent='カテゴリ別予算';
   const byCat=getSpendingByCat(),daysLeft=getDaysLeft(),c=$('budgetCards');
   let h='';
-  data.budgets.forEach(b=>{
-    const info=byCat[b.name]||{budget:0,spent:0},rem=info.budget-info.spent,daily=rem>0?Math.floor(rem/daysLeft):0;
-    const pct=info.budget>0?Math.round(info.spent/info.budget*100):(info.spent>0?100:0);
-    const cls=pct>100?'over':pct>80?'warn':'ok',col=catColor(b.name);
-    h+='<div class="budget-card"><div class="budget-header"><span class="budget-name" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:'+col+'"></span>'+b.name+'</span>';
-    h+='<span class="budget-remaining" style="color:'+(rem<0?'var(--red)':'var(--text)')+'">'+fmt(rem)+'</span></div>';
-    h+='<div class="budget-bar"><div class="budget-fill '+cls+'" style="width:'+Math.min(pct,100)+'%"></div></div>';
-    h+='<div class="budget-meta"><span>'+fmt(info.spent)+' / '+fmt(info.budget)+'</span><span>1日 '+fmt(daily)+'</span></div></div>';
+  [1,2,3,4].forEach(g=>{
+    const cats=data.categories.filter(x=>x.group===g);
+    if(!cats.length)return;
+    const hasActivity=cats.some(b=>{const info=byCat[b.name]||{budget:0,spent:0};return info.budget>0||info.spent>0});
+    if(!hasActivity)return;
+    h+='<div style="font-size:.68rem;font-weight:600;color:var(--text3);margin:10px 0 4px;padding-left:2px">'+g+'  '+GROUP_NAMES[g]+'</div>';
+    cats.forEach(b=>{
+      const info=byCat[b.name]||{budget:0,spent:0};
+      if(info.budget<=0&&info.spent<=0)return;
+      const rem=info.budget-info.spent,daily=rem>0?Math.floor(rem/daysLeft):0;
+      const pct=info.budget>0?Math.round(info.spent/info.budget*100):(info.spent>0?100:0);
+      const cls=pct>100?'over':pct>80?'warn':'ok',col=b.color||catColor(b.name);
+      h+='<div class="budget-card"><div class="budget-header"><span class="budget-name" style="display:flex;align-items:center;gap:6px"><span style="font-size:.85rem">'+b.icon+'</span><span style="width:10px;height:10px;border-radius:3px;background:'+col+'"></span>'+b.name+'</span>';
+      h+='<span class="budget-remaining" style="color:'+(rem<0?'var(--red)':'var(--text)')+'">'+fmt(rem)+'</span></div>';
+      h+='<div class="budget-bar"><div class="budget-fill '+cls+'" style="width:'+Math.min(pct,100)+'%"></div></div>';
+      h+='<div class="budget-meta"><span>'+fmt(info.spent)+' / '+fmt(info.budget)+'</span><span>1日 '+fmt(daily)+'</span></div></div>';
+    });
   });
   c.innerHTML=h;
   renderDonut();
@@ -1169,12 +1221,12 @@ function renderRecord(){
 function renderDonut(){
   const byCat=getSpendingByCat(),svg=$('donutChart');svg.innerHTML='';
   let total=0;const items=[];
-  Object.entries(byCat).forEach(([name,info])=>{if(info.spent>0){items.push({name,amount:info.spent,color:catColor(name)});total+=info.spent}});
+  Object.entries(byCat).forEach(([name,info])=>{if(info.spent>0){const cat=data.categories.find(c=>c.name===name);items.push({name,amount:info.spent,color:cat?cat.color:catColor(name),icon:cat?cat.icon:'📦'});total+=info.spent}});
   fitText($('donutTotal'),fmt(total),1.0,0.6);
   if(!total){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx','70');c.setAttribute('cy','70');c.setAttribute('r','50');c.setAttribute('fill','none');c.setAttribute('stroke','var(--bg)');c.setAttribute('stroke-width','14');svg.appendChild(c);$('donutLegend').innerHTML='';return}
   const cx=70,cy=70,r=50,circ=2*Math.PI*r;let off=0;
   items.forEach(i=>{const pct=i.amount/total,dl=pct*circ;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);c.setAttribute('fill','none');c.setAttribute('stroke',i.color);c.setAttribute('stroke-width','14');c.setAttribute('stroke-dasharray',dl+' '+(circ-dl));c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 70 70)');svg.appendChild(c);off+=dl});
-  let lg='';items.forEach(i=>{lg+='<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:'+i.color+'"></span>'+i.name+' '+Math.round(i.amount/total*100)+'%</span>'});
+  let lg='';items.forEach(i=>{lg+='<span style="display:flex;align-items:center;gap:3px"><span style="font-size:.7rem">'+i.icon+'</span><span style="width:8px;height:8px;border-radius:2px;background:'+i.color+'"></span>'+i.name+' '+Math.round(i.amount/total*100)+'%</span>'});
   $('donutLegend').innerHTML=lg;
 }
 
@@ -1225,7 +1277,7 @@ function initSettings(){
   // Export
   $('btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='moneyflow_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u)});
   $('btnImport').addEventListener('click',()=>$('fileImport').click());
-  $('fileImport').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const im=JSON.parse(ev.target.result);if(!im.income||!im.expenses)return alert('無効なファイル');if(!confirm('データを上書きしますか？'))return;data=Object.assign(defaultData(),im);data.income=Object.assign(defaultData().income,im.income||{});data.expenses=Object.assign(defaultData().expenses,im.expenses||{});data.balance=Object.assign(defaultData().balance,im.balance||{});data.settings=Object.assign(defaultData().settings,im.settings||{});if(Array.isArray(im.budgets))data.budgets=im.budgets;if(Array.isArray(im.spending))data.spending=im.spending;if(im.spendingArchive)data.spendingArchive=im.spendingArchive;saveNow();goToPage(0);alert('インポート完了')}catch(err){alert('エラー: '+err.message)}};r.readAsText(f);e.target.value=''});
+  $('fileImport').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const im=JSON.parse(ev.target.result);if(!im.income||!im.expenses)return alert('無効なファイル');if(!confirm('データを上書きしますか？'))return;data=Object.assign(defaultData(),im);data.income=Object.assign(defaultData().income,im.income||{});data.expenses=Object.assign(defaultData().expenses,im.expenses||{});data.balance=Object.assign(defaultData().balance,im.balance||{});data.settings=Object.assign(defaultData().settings,im.settings||{});if(Array.isArray(im.categories))data.categories=im.categories;else if(Array.isArray(im.budgets)){const def=defaultData().categories;im.budgets.forEach(b=>{const ex=def.find(c=>c.name===b.name);if(ex)ex.amount=b.amount||0;else def.push({id:b.id||genId(),group:4,name:b.name,amount:b.amount||0,icon:'📦',color:'#6B7280'})});data.categories=def}if(Array.isArray(im.spending))data.spending=im.spending;if(im.spendingArchive)data.spendingArchive=im.spendingArchive;saveNow();goToPage(0);alert('インポート完了')}catch(err){alert('エラー: '+err.message)}};r.readAsText(f);e.target.value=''});
 
   // App update
   $('btnAppUpdate').addEventListener('click',async()=>{
@@ -1294,18 +1346,40 @@ function initFixedModal(){
 }
 
 // ===== INPUT MODAL (FAB) =====
+let inputSelectedGroup=2;
+function populateCatPicker(grpContainer,catContainer,hiddenInput,selectedCat){
+  grpContainer.innerHTML='';catContainer.innerHTML='';
+  [1,2,3,4].forEach(g=>{
+    const b=document.createElement('button');b.type='button';b.className='grp-btn'+(inputSelectedGroup===g?' active':'');
+    b.textContent=g+' '+GROUP_NAMES[g];
+    b.addEventListener('click',()=>{inputSelectedGroup=g;populateCatPicker(grpContainer,catContainer,hiddenInput,hiddenInput.value)});
+    grpContainer.appendChild(b);
+  });
+  const cats=data.categories.filter(c=>c.group===inputSelectedGroup);
+  cats.forEach(c=>{
+    const ch=document.createElement('button');ch.type='button';ch.className='cat-chip'+(c.name===selectedCat?' active':'');
+    ch.innerHTML='<span>'+c.icon+'</span>'+c.name;
+    ch.addEventListener('click',()=>{
+      hiddenInput.value=c.name;
+      catContainer.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
+      ch.classList.add('active');
+    });
+    catContainer.appendChild(ch);
+  });
+  if(!selectedCat&&cats.length){hiddenInput.value=cats[0].name;catContainer.querySelector('.cat-chip')?.classList.add('active')}
+}
 function initInput(){
   $('fab').addEventListener('click',()=>{
-    $('inpSpendAmt').value='';$('inpSpendMemo').value='';
-    // Populate categories
-    const sel=$('inpSpendCat');sel.innerHTML='';
-    data.budgets.forEach(b=>{const o=document.createElement('option');o.value=b.name;o.textContent=b.name;sel.appendChild(o)});
+    $('inpSpendAmt').value='';$('inpSpendMemo').value='';$('inpSpendCat').value='';
+    inputSelectedGroup=2;
+    populateCatPicker($('inpGroupBtns'),$('inpCatGrid'),$('inpSpendCat'),'');
     showModal('modalInput');
     setTimeout(()=>$('inpSpendAmt').focus(),300);
   });
   $('btnSpendSave').addEventListener('click',()=>{
     const amt=clampAmt(parseFloat($('inpSpendAmt').value));if(!amt||amt<=0)return $('inpSpendAmt').focus();
-    data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:$('inpSpendCat').value,memo:$('inpSpendMemo').value.trim()});
+    const cat=$('inpSpendCat').value;if(!cat)return;
+    data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:cat,memo:$('inpSpendMemo').value.trim()});
     saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===1)renderRecord();checkBudgetAlerts();
   });
   $('inpSpendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSpendSave').click()});
@@ -1318,17 +1392,38 @@ function initBalance(){
 }
 
 // ===== BUDGET MODAL =====
+let budgetEditGroup=1;
 function initBudget(){
-  $('btnEditBudgets').addEventListener('click',()=>{renderBudgetEdit();showModal('modalBudget')});
-  $('btnAddCat').addEventListener('click',()=>{const n=$('newCatName').value.trim();if(!n)return;if(data.budgets.some(b=>b.name===n))return alert('同名カテゴリあり');data.budgets.push({id:genId(),name:n,amount:0});$('newCatName').value='';renderBudgetEdit()});
-  $('btnBudgetSave').addEventListener('click',()=>{$$('#budgetEditList .be-amt').forEach(inp=>{const b=data.budgets.find(x=>x.id===inp.dataset.id);if(b)b.amount=clampAmt(parseFloat(inp.value))});saveNow();renderRecord();hideModal('modalBudget')});
+  $('btnEditBudgets').addEventListener('click',()=>{budgetEditGroup=1;renderBudgetGroupTabs();renderBudgetEdit();showModal('modalBudget')});
+  $('btnAddCat').addEventListener('click',()=>{const n=$('newCatName').value.trim();if(!n)return;if(data.categories.some(c=>c.name===n))return alert('同名カテゴリあり');data.categories.push({id:genId(),group:budgetEditGroup,name:n,amount:0,icon:'📦',color:'#6B7280'});$('newCatName').value='';renderBudgetEdit()});
+  $('btnBudgetSave').addEventListener('click',()=>{
+    $$('#budgetEditList .be-amt').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.amount=clampAmt(parseFloat(inp.value))});
+    $$('#budgetEditList .be-name').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.name=inp.value.trim()||c.name});
+    $$('#budgetEditList .be-icon').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.icon=inp.value.trim()||c.icon});
+    $$('#budgetEditList .be-color').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.color=inp.value});
+    saveNow();renderRecord();hideModal('modalBudget');
+  });
+}
+function renderBudgetGroupTabs(){
+  const t=$('budgetGroupTabs');t.innerHTML='';
+  [1,2,3,4].forEach(g=>{
+    const b=document.createElement('button');b.type='button';b.className='grp-btn'+(budgetEditGroup===g?' active':'');
+    b.textContent=g+' '+GROUP_NAMES[g];
+    b.addEventListener('click',()=>{budgetEditGroup=g;renderBudgetGroupTabs();renderBudgetEdit()});
+    t.appendChild(b);
+  });
 }
 function renderBudgetEdit(){
   const c=$('budgetEditList');c.innerHTML='';
-  data.budgets.forEach(b=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px';
-  d.innerHTML='<span style="flex:1;font-size:.88rem">'+b.name+'</span><input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" max="999900000000" style="width:130px;height:40px;font-size:.88rem"><button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
+  const cats=data.categories.filter(x=>x.group===budgetEditGroup);
+  cats.forEach(b=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap';
+  d.innerHTML='<input type="text" class="form-input be-icon" data-id="'+b.id+'" value="'+b.icon+'" style="width:36px;height:36px;text-align:center;font-size:1rem;padding:0">'
+    +'<input type="color" class="be-color" data-id="'+b.id+'" value="'+b.color+'" style="width:32px;height:36px;border:none;padding:0;cursor:pointer;border-radius:4px">'
+    +'<input type="text" class="form-input be-name" data-id="'+b.id+'" value="'+b.name+'" style="flex:1;min-width:80px;height:36px;font-size:.8rem">'
+    +'<input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" max="999900000000" style="width:90px;height:36px;font-size:.8rem">'
+    +'<button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
   c.appendChild(d)});
-  c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{if(confirm('カテゴリ「'+data.budgets.find(b=>b.id===btn.dataset.id)?.name+'」を削除？')){data.budgets=data.budgets.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
+  c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{const cat=data.categories.find(b=>b.id===btn.dataset.id);if(cat&&confirm('「'+cat.name+'」を削除？')){data.categories=data.categories.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
 }
 
 // ===== BUDGET NOTIFICATIONS =====

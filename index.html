@@ -408,7 +408,51 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
   </div>
 
-  <!-- Page 2: Forecast -->
+  <!-- Page 2: Record -->
+  <div class="page" id="pageRecord">
+    <div style="text-align:center;margin-bottom:12px">
+      <h2 style="font-size:1.05rem;font-weight:700" id="recordMonth">5月の家計簿</h2>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;background:var(--accent-soft);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:.72rem;color:var(--accent);font-weight:500">
+      <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      支出を記録すると予測にリアルタイム反映されます
+    </div>
+
+    <div class="section-header">
+      <span class="section-title" id="analysisMonth">カテゴリ別予算</span>
+      <button class="btn-edit-budget" id="btnEditBudgets" aria-label="Edit budgets">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>編集</span>
+      </button>
+    </div>
+    <div id="budgetCards"></div>
+
+    <div class="card card-sm" style="margin-top:8px">
+      <div class="card-title">支出内訳</div>
+      <div style="position:relative;width:140px;height:140px;margin:0 auto">
+        <svg id="donutChart" viewBox="0 0 140 140" width="140" height="140"></svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+          <div style="font-family:var(--font-num);font-size:1rem;font-weight:600" id="donutTotal">¥0</div>
+          <div style="font-size:.6rem;color:var(--text3)">今月の支出</div>
+        </div>
+      </div>
+      <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.68rem"></div>
+    </div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-title">最近の支出</span>
+    </div>
+    <div id="recordTimeline"></div>
+    <div id="recordTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
+
+    <button id="btnSettle" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      今月を確定する
+    </button>
+  </div>
+
+  <!-- Page 3: Forecast -->
   <div class="page" id="pageForecast">
     <div class="month-nav">
       <button class="nav-btn" id="btnPrevMonth"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -481,50 +525,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
         <div style="padding-top:8px" id="loanContent"></div>
       </div>
     </div>
-  </div>
-
-  <!-- Page 3: Record -->
-  <div class="page" id="pageRecord">
-    <div style="text-align:center;margin-bottom:12px">
-      <h2 style="font-size:1.05rem;font-weight:700" id="recordMonth">5月の家計簿</h2>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:8px;background:var(--accent-soft);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:.72rem;color:var(--accent);font-weight:500">
-      <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      支出を記録すると予測にリアルタイム反映されます
-    </div>
-
-    <div class="section-header">
-      <span class="section-title" id="analysisMonth">カテゴリ別予算</span>
-      <button class="btn-edit-budget" id="btnEditBudgets" aria-label="Edit budgets">
-        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <span>編集</span>
-      </button>
-    </div>
-    <div id="budgetCards"></div>
-
-    <div class="card card-sm" style="margin-top:8px">
-      <div class="card-title">支出内訳</div>
-      <div style="position:relative;width:140px;height:140px;margin:0 auto">
-        <svg id="donutChart" viewBox="0 0 140 140" width="140" height="140"></svg>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
-          <div style="font-family:var(--font-num);font-size:1rem;font-weight:600" id="donutTotal">¥0</div>
-          <div style="font-size:.6rem;color:var(--text3)">今月の支出</div>
-        </div>
-      </div>
-      <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.68rem"></div>
-    </div>
-
-    <div class="section-header" style="margin-top:8px">
-      <span class="section-title">最近の支出</span>
-    </div>
-    <div id="recordTimeline"></div>
-    <div id="recordTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
-
-    <button id="btnSettle" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      今月を確定する
-    </button>
   </div>
 
   <!-- Page 4: Settings -->

@@ -67,7 +67,7 @@ bottom:calc(var(--bottom-h) + var(--safe-bottom));
 overflow:hidden;
 }
 .swipe-inner{display:flex;height:100%;will-change:transform}
-.page{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px}
+.page{flex:0 0 100%;width:100%;height:100%;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 24px}
 @media(min-width:641px){
 .swipe-inner{display:block;width:100%;height:100%;transform:none!important;transition:none!important}
 .page{display:none;width:100%;height:100%;flex:none}
@@ -1564,10 +1564,10 @@ let calYear,calMonth,calSelectedDay=null,calFilter='all';
 function getCalendarItems(y,m){
   const daysInMonth=new Date(y,m,0).getDate();
   return data.expenses.fixed.filter(f=>{
-    if(!f.dueDay||!f.calendarGroup)return false;
     if(f.isLoan&&f.remainingCount<=0)return false;
     if(f.isLoan&&isLoanPaid(f,y,m))return false;
-    if(calFilter!=='all'&&f.calendarGroup!==calFilter)return false;
+    const grp=f.calendarGroup||'other';
+    if(calFilter!=='all'&&grp!==calFilter)return false;
     return true;
   });
 }
@@ -1591,7 +1591,7 @@ function renderCalendar(){
   // Group items by actual day
   const dayMap={};
   items.forEach(f=>{
-    const actualDay=Math.min(f.dueDay,daysInMonth);
+    const actualDay=Math.min(f.dueDay||1,daysInMonth);
     if(!dayMap[actualDay])dayMap[actualDay]=[];
     dayMap[actualDay].push(f);
   });
@@ -1614,7 +1614,7 @@ function renderCalendar(){
     html+='<div class="'+cls+'" data-day="'+d+'"><div class="cal-day">'+d+'</div>';
     if(dayMap[d]){
       html+='<div class="cal-dots">';
-      dayMap[d].slice(0,4).forEach(f=>{html+='<div class="cal-dot" style="background:'+calGroupColor(f.calendarGroup)+'"></div>'});
+      dayMap[d].slice(0,4).forEach(f=>{html+='<div class="cal-dot" style="background:'+calGroupColor(f.calendarGroup||'other')+'"></div>'});
       if(dayMap[d].length>4)html+='<span class="cal-plus">+</span>';
       html+='</div>';
     }
@@ -1659,7 +1659,7 @@ function renderCalDetail(dayMap){
   let total=0;
   let html='<div style="font-size:.78rem;font-weight:700;margin-bottom:8px">'+calMonth+'/'+calSelectedDay+' の引き落とし</div>';
   items.forEach(f=>{
-    const col=calGroupColor(f.calendarGroup);
+    const col=calGroupColor(f.calendarGroup||'other');
     html+='<div class="cal-detail-item">'
       +'<div style="width:10px;height:10px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
       +'<div style="flex:1;font-size:.85rem;font-weight:500">'+f.name+'</div>'

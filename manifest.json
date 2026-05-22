@@ -4,8 +4,8 @@
   "description": "将来の収支を予測できる家計管理アプリ",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0a1628",
-  "theme_color": "#0a1628",
+  "background_color": "#F5F7FA",
+  "theme_color": "#F5F7FA",
   "orientation": "portrait-primary",
   "lang": "ja",
   "icons": [

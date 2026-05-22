@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#F5F7FA">
+<meta name="theme-color" content="#F5F7FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F172A" media="(prefers-color-scheme: dark)">
 <meta name="description" content="MoneyFlow - 将来の家計が見える家計管理アプリ">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -33,7 +34,7 @@
 .dark{
 --bg:#0F172A;--card:#1E293B;
 --card-shadow:0 1px 4px rgba(0,0,0,.2),0 4px 16px rgba(0,0,0,.15);
---text:#E2E8F0;--text2:#94A3B8;--text3:#475569;
+--text:#E2E8F0;--text2:#94A3B8;--text3:#64748B;
 --accent:#2DD4BF;--accent2:#14B8A6;--accent-soft:rgba(45,212,191,.1);
 --border:rgba(255,255,255,.06);
 --red:#F87171;--red-soft:rgba(248,113,113,.1);
@@ -729,7 +730,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 <button class="fab" id="fab" aria-label="支出を入力">+</button>
 
 <!-- Input Modal -->
-<div class="modal-overlay" id="modalInput">
+<div class="modal-overlay" role="dialog" id="modalInput">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">支出を記録</h3>
@@ -750,7 +751,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Balance Edit Modal -->
-<div class="modal-overlay" id="modalBalance">
+<div class="modal-overlay" role="dialog" id="modalBalance">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">残高を編集</h3>
@@ -762,7 +763,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Fixed Expense Modal -->
-<div class="modal-overlay" id="modalFixed">
+<div class="modal-overlay" role="dialog" id="modalFixed">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px" id="fixedModalTitle">固定費を追加</h3>
@@ -798,7 +799,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Variable Expense Modal -->
-<div class="modal-overlay" id="modalVar">
+<div class="modal-overlay" role="dialog" id="modalVar">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px" id="varModalTitle">変動費を追加</h3>
@@ -819,7 +820,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Budget Edit Modal -->
-<div class="modal-overlay" id="modalBudget">
+<div class="modal-overlay" role="dialog" id="modalBudget">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:12px">カテゴリ予算を編集</h3>
@@ -834,7 +835,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Spending Edit Modal -->
-<div class="modal-overlay" id="modalSpendEdit">
+<div class="modal-overlay" role="dialog" id="modalSpendEdit">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">支出を編集</h3>
@@ -857,12 +858,12 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <input type="date" class="form-input" id="editSpendDate" style="height:44px;font-size:.88rem">
     </div>
     <button class="btn-primary" id="btnSpendEditSave">保存</button>
-    <button id="btnSpendEditDelete" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;margin-top:8px;border:1.5px solid var(--red);border-radius:var(--radius-sm);background:var(--red-soft);color:var(--red);font-size:.85rem;font-weight:600;cursor:pointer">削除する</button>
+    <button id="btnSpendEditDelete" aria-label="支出を削除" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;margin-top:8px;border:1.5px solid var(--red);border-radius:var(--radius-sm);background:var(--red-soft);color:var(--red);font-size:.85rem;font-weight:600;cursor:pointer">削除する</button>
   </div>
 </div>
 
 <!-- Settle Modal -->
-<div class="modal-overlay" id="modalSettle">
+<div class="modal-overlay" role="dialog" id="modalSettle">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:16px">今月を確定する</h3>
@@ -877,7 +878,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 </div>
 
 <!-- Suggestion Modal -->
-<div class="modal-overlay" id="modalSuggestion">
+<div class="modal-overlay" role="dialog" id="modalSuggestion">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 style="font-size:1rem;margin-bottom:4px">予算の提案</h3>
@@ -1195,12 +1196,12 @@ function renderPace(totalBudget,totalSpent,daysLeft){
   let color='var(--accent)',msgClass='ok',msg='順調なペースです';
   if(budgetPct>timePct+15){color='var(--orange)';msgClass='warn';msg='消化ペースがやや速めです'}
   if(budgetPct>90){color='var(--red)';msgClass='over';msg='予算残りわずかです'}
-  const msgBg=msgClass==='ok'?'rgba(20,184,166,.06)':msgClass==='warn'?'rgba(245,158,11,.06)':'rgba(239,68,68,.06)';
-  const msgColor=msgClass==='ok'?'var(--accent2)':msgClass==='warn'?'#92400E':'#B91C1C';
+  const msgBg=msgClass==='ok'?'var(--green-soft)':msgClass==='warn'?'var(--orange-soft)':'var(--red-soft)';
+  const msgColor=msgClass==='ok'?'var(--accent2)':msgClass==='warn'?'var(--orange)':'var(--red)';
   c.innerHTML='<div style="position:relative;width:96px;height:96px;flex-shrink:0">'
     +'<svg viewBox="0 0 96 96" width="96" height="96" style="transform:rotate(-90deg)">'
     +'<circle cx="48" cy="48" r="38" fill="none" stroke="var(--bg)" stroke-width="7"/>'
-    +'<circle cx="48" cy="48" r="38" fill="none" stroke="rgba(20,184,166,.18)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+timeDash+' '+circ+'"/>'
+    +'<circle cx="48" cy="48" r="38" fill="none" stroke="var(--accent-soft)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+timeDash+' '+circ+'"/>'
     +'<circle cx="48" cy="48" r="38" fill="none" stroke="'+color+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+budgetDash+' '+circ+'"/>'
     +'</svg>'
     +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">'
@@ -1208,7 +1209,7 @@ function renderPace(totalBudget,totalSpent,daysLeft){
     +'<div style="font-size:.48rem;color:var(--text3)">予算消化</div></div></div>'
     +'<div style="flex:1;min-width:0">'
     +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:'+color+'"></div><span style="font-size:.72rem;color:var(--text2)">予算消化 <strong style="font-family:var(--font-num);color:var(--text)">'+budgetPct+'%</strong></span></div>'
-    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:rgba(20,184,166,.3)"></div><span style="font-size:.72rem;color:var(--text2)">経過日数 <strong style="font-family:var(--font-num);color:var(--text)">'+timePct+'%</strong>（'+day+'日目/'+lastDay+'日）</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent-soft)"></div><span style="font-size:.72rem;color:var(--text2)">経過日数 <strong style="font-family:var(--font-num);color:var(--text)">'+timePct+'%</strong>（'+day+'日目/'+lastDay+'日）</span></div>'
     +'<div style="font-size:.68rem;padding:6px 10px;border-radius:8px;background:'+msgBg+';color:'+msgColor+';font-weight:500">'+msg+'</div></div>';
 }
 
@@ -1223,7 +1224,7 @@ function renderMonthlySummary(){
       chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:var(--green-soft);color:var(--accent);display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'+month+'月</span>';
     }
   }
-  chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:rgba(245,158,11,.08);color:#D97706;display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite"></span>'+cm+'月 記録中</span>';
+  chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:var(--orange-soft);color:var(--orange);display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite"></span>'+cm+'月 記録中</span>';
   c.innerHTML='<div style="font-size:.78rem;font-weight:700;margin-bottom:10px">月次サマリー</div>'
     +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
     +'<div style="font-size:.65rem;color:var(--text3)">確定が増えるほど予測が正確になります</div>';
@@ -1238,7 +1239,7 @@ function renderMiniChart(){
   let path='M'+pts.map(p=>p.x+','+p.y).join(' L');
   let area=path+' L'+pts[pts.length-1].x+','+H+' L'+padL+','+H+'Z';
   let svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="100%" preserveAspectRatio="none">'
-    +'<defs><linearGradient id="mcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(20,184,166,.12)"/><stop offset="100%" stop-color="rgba(20,184,166,0)"/></linearGradient></defs>'
+    +'<defs><linearGradient id="mcg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".12"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>'
     +'<text x="'+(padL-4)+'" y="'+(padT+6)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)" text-anchor="end">'+fmtShort(maxV)+'</text>'
     +'<text x="'+(padL-4)+'" y="'+(H-padB)+'" fill="var(--text3)" font-size="9" font-family="var(--font-num)" text-anchor="end">'+fmtShort(minV)+'</text>'
     +'<path d="'+area+'" fill="url(#mcg)"/>'
@@ -1545,7 +1546,7 @@ function initSettings(){
 
   // Dark mode
   const t=$('toggleDark');
-  function updDark(){if(data.settings.darkMode){t.classList.add('on');document.documentElement.classList.add('dark')}else{t.classList.remove('on');document.documentElement.classList.remove('dark')}}
+  function updDark(){if(data.settings.darkMode){t.classList.add('on');document.documentElement.classList.add('dark')}else{t.classList.remove('on');document.documentElement.classList.remove('dark')}document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content',data.settings.darkMode?'#0F172A':'#F5F7FA'))}
   t.addEventListener('click',()=>{data.settings.darkMode=!data.settings.darkMode;updDark();saveData()});updDark();
 
   // Notifications
@@ -1565,7 +1566,7 @@ function initSettings(){
   // Export
   $('btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='moneyflow_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u)});
   $('btnImport').addEventListener('click',()=>$('fileImport').click());
-  $('fileImport').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const im=JSON.parse(ev.target.result);if(!im.income||!im.expenses)return alert('無効なファイル');if(!confirm('データを上書きしますか？'))return;data=Object.assign(defaultData(),im);data.income=Object.assign(defaultData().income,im.income||{});data.expenses=Object.assign(defaultData().expenses,im.expenses||{});data.balance=Object.assign(defaultData().balance,im.balance||{});data.settings=Object.assign(defaultData().settings,im.settings||{});if(Array.isArray(im.categories))data.categories=im.categories;else if(Array.isArray(im.budgets)){const def=defaultData().categories;im.budgets.forEach(b=>{const ex=def.find(c=>c.name===b.name);if(ex)ex.amount=b.amount||0;else def.push({id:b.id||genId(),group:2,name:b.name,amount:b.amount||0,icon:'📝',color:'#6B7280'})});data.categories=def}if(Array.isArray(im.spending))data.spending=im.spending;if(im.spendingArchive)data.spendingArchive=im.spendingArchive;saveNow();goToPage(0);alert('インポート完了')}catch(err){alert('エラー: '+err.message)}};r.readAsText(f);e.target.value=''});
+  $('fileImport').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const im=JSON.parse(ev.target.result);if(!im.income||!im.expenses||typeof im.income!=='object'||typeof im.expenses!=='object')return alert('無効なファイル');if(!confirm('データを上書きしますか？'))return;data=Object.assign(defaultData(),im);data.income=Object.assign(defaultData().income,im.income||{});data.expenses=Object.assign(defaultData().expenses,im.expenses||{});data.balance=Object.assign(defaultData().balance,im.balance||{});data.settings=Object.assign(defaultData().settings,im.settings||{});if(Array.isArray(im.categories))data.categories=im.categories;else if(Array.isArray(im.budgets)){const def=defaultData().categories;im.budgets.forEach(b=>{const ex=def.find(c=>c.name===b.name);if(ex)ex.amount=b.amount||0;else def.push({id:b.id||genId(),group:2,name:b.name,amount:b.amount||0,icon:'📝',color:'#6B7280'})});data.categories=def}if(Array.isArray(im.spending))data.spending=im.spending;if(im.spendingArchive)data.spendingArchive=im.spendingArchive;saveNow();goToPage(0);alert('インポート完了')}catch(err){alert('エラー: '+err.message)}};r.onerror=()=>{alert('ファイルの読み込みに失敗しました')};r.readAsText(f);e.target.value=''});
 
   // App update
   $('btnAppUpdate').addEventListener('click',async()=>{
@@ -1586,7 +1587,7 @@ function renderFixedList(){
     const div=document.createElement('div');div.className='exp-item';div.draggable=true;div.dataset.idx=idx;
     let meta='';if(item.isLoan){const po=loanPayoff(item);meta='<div class="exp-meta">ローン | 残り'+(item.remainingCount||0)+'回 | 完済: '+(po?mLabel(po.year,po.month):'--')+'</div>'}
     if(item.category){const cat=data.categories.find(c=>c.name===item.category);meta+='<div class="exp-meta" style="color:var(--accent)">'+(cat?cat.icon+' ':'')+item.category+'</div>'}
-    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-edit-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'固定費')+(item.isLoan?' <span class="tag tag-loan">ローン</span>':'')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-id="'+item.id+'">×</button>';
+    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-edit-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'固定費')+(item.isLoan?' <span class="tag tag-loan">ローン</span>':'')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-id="'+item.id+'" aria-label="'+(item.name||'固定費')+'を削除">×</button>';
     // Drag
     div.addEventListener('dragstart',()=>{dragIdx=idx;div.classList.add('dragging')});
     div.addEventListener('dragend',()=>{div.classList.remove('dragging');c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'))});
@@ -1654,7 +1655,7 @@ function renderVarList(){
     const div=document.createElement('div');div.className='exp-item';div.draggable=true;div.dataset.idx=idx;
     let meta='';
     if(item.category)meta='<div class="exp-meta" style="color:var(--text3)">'+item.category+'</div>';
-    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-var-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'変動費')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-var-del="'+item.id+'">×</button>';
+    div.innerHTML='<div class="exp-handle"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><div class="exp-body" data-var-id="'+item.id+'" style="cursor:pointer"><div class="exp-name">'+(item.name||'変動費')+'</div><div class="exp-amount">'+fmt(item.amount)+'</div>'+meta+'</div><button class="exp-del" data-var-del="'+item.id+'" aria-label="'+(item.name||'変動費')+'を削除">×</button>';
     div.addEventListener('dragstart',()=>{varDragIdx=idx;div.classList.add('dragging')});
     div.addEventListener('dragend',()=>{div.classList.remove('dragging');c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'))});
     div.addEventListener('dragover',e=>{e.preventDefault();c.querySelectorAll('.exp-item').forEach(el=>el.classList.remove('drag-over'));div.classList.add('drag-over')});
@@ -1958,7 +1959,7 @@ function renderBudgetEdit(){
     +'<input type="color" class="be-color" data-id="'+b.id+'" value="'+b.color+'" style="width:32px;height:36px;border:none;padding:0;cursor:pointer;border-radius:4px">'
     +'<input type="text" class="form-input be-name" data-id="'+b.id+'" value="'+b.name+'" style="flex:1;min-width:80px;height:36px;font-size:.8rem">'
     +'<input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" max="999900000000" style="width:90px;height:36px;font-size:.8rem">'
-    +'<button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
+    +'<button class="exp-del be-del" data-id="'+b.id+'" aria-label="'+b.name+'を削除" style="width:28px;height:28px;font-size:.85rem">×</button>';
   c.appendChild(d)});
   c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{const cat=data.categories.find(b=>b.id===btn.dataset.id);if(cat&&confirm('「'+cat.name+'」を削除？')){data.categories=data.categories.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
 }
@@ -2062,9 +2063,9 @@ function renderSuggestionList(){
   if(!sugs.length){c.innerHTML='<div class="empty">提案はありません</div>';return}
   let h='';
   sugs.forEach(s=>{
-    const dc=s.diff<0?'var(--accent)':'var(--red)',db=s.diff<0?'var(--green-soft)':'var(--red-soft)',dl=(s.diff>0?'+':'')+fmt(s.diff);
-    h+='<div class="suggest-item" style="border-left:4px solid '+s.color+';background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)">';
-    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:'+s.color+'20;display:flex;align-items:center;justify-content:center;font-size:.95rem">'+s.icon+'</div>';
+    const dc=s.diff<0?'var(--accent)':'var(--red)',db=s.diff<0?'var(--green-soft)':'var(--red-soft)',dl=(s.diff>0?'+':'')+fmt(s.diff),sc=s.color||'#6B7280';
+    h+='<div class="suggest-item" style="border-left:4px solid '+sc+';background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)">';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:.95rem">'+s.icon+'</div>';
     h+='<div><div style="font-size:.85rem;font-weight:600">'+s.name+'</div><div style="font-size:.7rem;color:var(--text2)">直近3ヶ月の平均: '+fmt(s.avg)+'</div></div></div>';
     h+='<div style="background:var(--bg);border-radius:var(--radius-xs);padding:12px;margin-bottom:12px">';
     h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.78rem;color:var(--text2)">現在の予算</span><span style="font-family:var(--font-num);font-size:.85rem;font-weight:600">'+fmt(s.current)+'</span></div>';
@@ -2086,7 +2087,7 @@ function buildTrendSVG(budget,td){
   const W=288,H=100,pL=36,pR=4,pT=12,pB=18,cW=W-pL-pR,cH=H-pT-pB;
   const vals=td.map(d=>d.actual),maxV=Math.max(budget*1.3,...vals,1);
   let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'">';
-  for(let i=0;i<=2;i++){const y=pT+(cH*i/2),v=maxV*(1-i/2);s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="rgba(0,0,0,.04)" stroke-width=".5"/>';s+='<text x="'+(pL-4)+'" y="'+(y+3)+'" fill="var(--text3)" font-size="7" font-family="var(--font-num)" text-anchor="end">'+fmtShort(v)+'</text>'}
+  for(let i=0;i<=2;i++){const y=pT+(cH*i/2),v=maxV*(1-i/2);s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--border)" stroke-width=".5"/>';s+='<text x="'+(pL-4)+'" y="'+(y+3)+'" fill="var(--text3)" font-size="7" font-family="var(--font-num)" text-anchor="end">'+fmtShort(v)+'</text>'}
   if(budget>0){const by=pT+cH*(1-budget/maxV);s+='<line x1="'+pL+'" y1="'+by+'" x2="'+(W-pR)+'" y2="'+by+'" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".4"/>'}
   if(td.length>1){const step=cW/(td.length-1);const pts=td.map((d,i)=>({x:pL+i*step,y:pT+cH*(1-d.actual/maxV),a:d.actual}));
     const over=budget>0&&pts.some(p=>p.a>budget),lc=over?'var(--red)':'var(--accent)';
@@ -2217,7 +2218,7 @@ function checkBudgetAlerts(){
 }
 
 // ===== SERVICE WORKER =====
-function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}
+function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW registration failed:',e))}
 
 // ===== INIT =====
 function init(){

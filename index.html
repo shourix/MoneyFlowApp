@@ -416,6 +416,8 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="sub" id="homeDailySub">残り0日 / 予算残 ¥0</div>
     </div>
 
+    <div id="homeSuggestions" style="margin-bottom:14px"></div>
+
     <!-- Pace Indicator -->
     <div class="card" id="homePace" style="display:flex;align-items:center;gap:18px;padding:18px"></div>
 
@@ -467,6 +469,16 @@ font-size:.75rem;font-weight:600;transition:all .2s;
         </div>
       </div>
       <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.68rem"></div>
+    </div>
+
+    <div class="card card-sm" style="margin-top:8px">
+      <div class="collapse-header" data-target="trendBody">
+        <h3>トレンド分析</h3>
+        <svg class="collapse-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="collapse-body" id="trendBody">
+        <div style="padding-top:8px" id="trendContent"></div>
+      </div>
     </div>
 
     <div class="section-header" style="margin-top:8px">
@@ -649,6 +661,8 @@ font-size:.75rem;font-weight:600;transition:all .2s;
         カテゴリ予算を編集
       </button>
     </div>
+
+    <div class="card card-sm" id="settingsAccuracy" style="display:none"></div>
 
     <!-- Theme & Data -->
     <div class="card">
@@ -859,6 +873,16 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
     <div id="settleDiff" style="display:none;margin-bottom:12px"></div>
     <button class="btn-primary" id="btnSettleConfirm">確定する</button>
+  </div>
+</div>
+
+<!-- Suggestion Modal -->
+<div class="modal-overlay" id="modalSuggestion">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 style="font-size:1rem;margin-bottom:4px">予算の提案</h3>
+    <p style="font-size:.72rem;color:var(--text2);margin-bottom:16px">直近3ヶ月の実績をもとに予算を最適化します</p>
+    <div id="suggestionList"></div>
   </div>
 </div>
 
@@ -1157,6 +1181,7 @@ function renderHome(){
   // Mini chart
   renderMiniChart();
   renderTimeline('homeTimeline','homeTimelineEmpty');
+  renderSuggestionBanner();
 }
 
 function renderPace(totalBudget,totalSpent,daysLeft){
@@ -1426,6 +1451,7 @@ function renderRecord(){
   renderDonut();
   renderDailyChart();
   renderTimeline('recordTimeline','recordTimelineEmpty');
+  renderTrends();
   // Settle button status
   const settleKey=cY()+'-'+String(cM()).padStart(2,'0');
   const isSettled=data.settledMonths[settleKey];
@@ -1498,6 +1524,7 @@ function renderSettings(){
   $('inpBonus').value=data.income.bonusAmount||'';
   $('inpSide').value=data.income.sideIncome||'';
   updateDedDisplay();renderFixedList();renderVarList();
+  renderAccuracy();
 }
 
 function updateDedDisplay(){
@@ -1981,6 +2008,133 @@ function initSettle(){
     data.balance.current=clampAmt(actual);data.balance.lastUpdated=key;
     saveNow();hideModal('modalSettle');renderRecord();renderHome();
   });
+}
+
+// ===== PREDICTIONS =====
+function getMonthSpendingByCat(monthKey){
+  const curKey=cY()+'-'+String(cM()).padStart(2,'0');
+  const items=monthKey===curKey?(data.spending||[]):(data.spendingArchive[monthKey]||[]);
+  const r={};items.forEach(s=>{if(!r[s.category])r[s.category]=0;r[s.category]+=s.amount||0});return r;
+}
+function getSettledKeys(){return Object.keys(data.settledMonths).sort()}
+function getBudgetSuggestions(){
+  const keys=getSettledKeys();if(keys.length<3)return[];
+  const recent=keys.slice(-3),sugs=[];
+  data.categories.forEach(cat=>{
+    if(cat.amount<=0)return;
+    let t=0,c=0;
+    recent.forEach(k=>{const sp=getMonthSpendingByCat(k);if(sp[cat.name]!==undefined){t+=sp[cat.name];c++}});
+    if(!c)return;
+    const avg=t/c,sug=Math.max(1000,Math.round(avg/1000)*1000),diff=sug-cat.amount;
+    if(Math.abs(diff)/cat.amount<0.1)return;
+    sugs.push({catId:cat.id,name:cat.name,icon:cat.icon,color:cat.color,current:cat.amount,suggested:sug,avg:Math.round(avg),diff});
+  });return sugs;
+}
+function getAccuracyScores(){
+  const keys=getSettledKeys();if(!keys.length)return{overall:0,categories:{},months:0};
+  const cs={};let ts=0,tc=0;
+  data.categories.forEach(cat=>{
+    if(cat.amount<=0)return;let s=0,c=0;
+    keys.forEach(k=>{const sp=getMonthSpendingByCat(k);const a=sp[cat.name]||0;s+=Math.max(0,1-Math.abs(a-cat.amount)/cat.amount);c++});
+    if(c>0){cs[cat.name]=Math.round(s/c*100);ts+=s;tc+=c}
+  });return{overall:tc?Math.round(ts/tc*100):0,categories:cs,months:keys.length};
+}
+function getCatTrend(catName,n){
+  const r=[],keys=getSettledKeys(),recent=keys.slice(-Math.max(0,n-1));
+  recent.forEach(k=>{const sp=getMonthSpendingByCat(k),p=k.split('-');r.push({key:k,year:+p[0],month:+p[1],actual:sp[catName]||0})});
+  const curKey=cY()+'-'+String(cM()).padStart(2,'0');
+  if(!data.settledMonths[curKey]){const sp=getMonthSpendingByCat(curKey);r.push({key:curKey,year:cY(),month:cM(),actual:sp[catName]||0})}
+  return r;
+}
+function renderSuggestionBanner(){
+  const c=$('homeSuggestions'),sugs=getBudgetSuggestions();
+  if(!sugs.length){c.style.display='none';return}
+  c.style.display='block';
+  c.innerHTML='<div style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(20,184,166,.06),rgba(59,130,246,.06));border:1.5px solid rgba(20,184,166,.15);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer" id="sugBannerBtn">'
+    +'<div style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem">💡</div>'
+    +'<div style="flex:1"><div style="font-size:.82rem;font-weight:600;color:var(--text)">'+sugs.length+'件の予算提案</div>'
+    +'<div style="font-size:.7rem;color:var(--text2)">実績をもとに予算を最適化できます</div></div>'
+    +'<svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text3)" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
+  $('sugBannerBtn').addEventListener('click',()=>{renderSuggestionList();showModal('modalSuggestion')});
+}
+function renderSuggestionList(){
+  const c=$('suggestionList'),sugs=getBudgetSuggestions();
+  if(!sugs.length){c.innerHTML='<div class="empty">提案はありません</div>';return}
+  let h='';
+  sugs.forEach(s=>{
+    const dc=s.diff<0?'var(--accent)':'var(--red)',db=s.diff<0?'var(--green-soft)':'var(--red-soft)',dl=(s.diff>0?'+':'')+fmt(s.diff);
+    h+='<div class="suggest-item" style="border-left:4px solid '+s.color+';background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)">';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:'+s.color+'20;display:flex;align-items:center;justify-content:center;font-size:.95rem">'+s.icon+'</div>';
+    h+='<div><div style="font-size:.85rem;font-weight:600">'+s.name+'</div><div style="font-size:.7rem;color:var(--text2)">直近3ヶ月の平均: '+fmt(s.avg)+'</div></div></div>';
+    h+='<div style="background:var(--bg);border-radius:var(--radius-xs);padding:12px;margin-bottom:12px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.78rem;color:var(--text2)">現在の予算</span><span style="font-family:var(--font-num);font-size:.85rem;font-weight:600">'+fmt(s.current)+'</span></div>';
+    h+='<div style="display:flex;justify-content:space-between"><span style="font-size:.78rem;color:var(--text2)">提案</span><div style="display:flex;align-items:center;gap:4px"><span style="font-family:var(--font-num);font-size:.85rem;font-weight:600;color:'+dc+'">'+fmt(s.suggested)+'</span><span style="font-size:.68rem;padding:2px 6px;border-radius:4px;font-weight:600;font-family:var(--font-num);background:'+db+';color:'+dc+'">'+dl+'</span></div></div></div>';
+    h+='<div style="display:flex;gap:8px"><button class="suggest-accept" data-cat-id="'+s.catId+'" data-amount="'+s.suggested+'" style="flex:1;height:40px;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;font-size:.82rem;border:none;cursor:pointer">更新する</button>';
+    h+='<button class="suggest-skip" style="flex:1;height:40px;border-radius:var(--radius-xs);background:var(--bg);border:1.5px solid var(--border);color:var(--text3);font-weight:500;font-size:.82rem;cursor:pointer">スキップ</button></div></div>';
+  });
+  c.innerHTML=h;
+  c.querySelectorAll('.suggest-accept').forEach(btn=>{btn.addEventListener('click',()=>{
+    const cat=data.categories.find(x=>x.id===btn.dataset.catId);if(cat){cat.amount=+btn.dataset.amount;saveNow()}
+    btn.closest('.suggest-item').remove();if(!c.querySelector('.suggest-item')){hideModal('modalSuggestion');renderHome();renderRecord()}
+  })});
+  c.querySelectorAll('.suggest-skip').forEach(btn=>{btn.addEventListener('click',()=>{
+    btn.closest('.suggest-item').remove();if(!c.querySelector('.suggest-item')){hideModal('modalSuggestion');renderHome();renderRecord()}
+  })});
+}
+function buildTrendSVG(budget,td){
+  if(!td.length)return'';
+  const W=288,H=100,pL=36,pR=4,pT=12,pB=18,cW=W-pL-pR,cH=H-pT-pB;
+  const vals=td.map(d=>d.actual),maxV=Math.max(budget*1.3,...vals,1);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'">';
+  for(let i=0;i<=2;i++){const y=pT+(cH*i/2),v=maxV*(1-i/2);s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="rgba(0,0,0,.04)" stroke-width=".5"/>';s+='<text x="'+(pL-4)+'" y="'+(y+3)+'" fill="var(--text3)" font-size="7" font-family="var(--font-num)" text-anchor="end">'+fmtShort(v)+'</text>'}
+  if(budget>0){const by=pT+cH*(1-budget/maxV);s+='<line x1="'+pL+'" y1="'+by+'" x2="'+(W-pR)+'" y2="'+by+'" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".4"/>'}
+  if(td.length>1){const step=cW/(td.length-1);const pts=td.map((d,i)=>({x:pL+i*step,y:pT+cH*(1-d.actual/maxV),a:d.actual}));
+    const over=budget>0&&pts.some(p=>p.a>budget),lc=over?'var(--red)':'var(--accent)';
+    s+='<path d="M'+pts.map(p=>p.x+','+p.y).join(' L')+'" fill="none" stroke="'+lc+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    pts.forEach((p,i)=>{s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+lc+'"'+(i===pts.length-1?' stroke="#fff" stroke-width="2"':'')+'/>'});
+    td.forEach((d,i)=>{s+='<text x="'+(pL+i*step)+'" y="'+(H-2)+'" fill="var(--text3)" font-size="8" font-family="var(--font-num)" text-anchor="middle">'+d.month+'月</text>'});
+  }else if(td.length===1){const x=pL+cW/2,y=pT+cH*(1-td[0].actual/maxV);s+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="var(--accent)"/>';s+='<text x="'+x+'" y="'+(H-2)+'" fill="var(--text3)" font-size="8" font-family="var(--font-num)" text-anchor="middle">'+td[0].month+'月</text>'}
+  s+='</svg>';return s;
+}
+function renderTrends(){
+  const c=$('trendContent'),keys=getSettledKeys();
+  const hasData=keys.length>0||data.spending.length>0;
+  if(!hasData){c.innerHTML='<div class="empty" style="font-size:.72rem">確定月のデータが貯まるとトレンドが表示されます</div>';return}
+  let h='<div style="display:flex;gap:12px;justify-content:flex-end;margin-bottom:8px;font-size:.65rem"><span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:2.5px;border-radius:2px;background:var(--accent)"></span>実績</span><span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:0;border-top:1.5px dashed var(--text3);opacity:.5"></span>予算</span></div>';
+  const cats=data.categories.filter(cat=>{if(cat.amount<=0)return false;const tr=getCatTrend(cat.name,6);return tr.some(d=>d.actual>0)});
+  if(!cats.length){c.innerHTML='<div class="empty" style="font-size:.72rem">カテゴリ予算を設定して支出を記録すると表示されます</div>';return}
+  cats.forEach(cat=>{
+    const tr=getCatTrend(cat.name,6),avg=tr.length?Math.round(tr.reduce((s,d)=>s+d.actual,0)/tr.length):0;
+    const overCnt=cat.amount>0?tr.filter(d=>d.actual>cat.amount).length:0;
+    h+='<div style="margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+    h+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:.85rem">'+cat.icon+'</span><span style="font-size:.82rem;font-weight:600">'+cat.name+'</span></div>';
+    if(overCnt>0)h+='<span style="font-size:.65rem;color:var(--red);font-weight:500">'+overCnt+'ヶ月予算超過</span>';
+    h+='</div>'+buildTrendSVG(cat.amount,tr);
+    h+='<div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text2);margin-top:4px"><span>平均: <strong style="font-family:var(--font-num);color:var(--text)">'+fmt(avg)+'</strong></span><span>予算: <strong style="font-family:var(--font-num);color:var(--text)">'+fmt(cat.amount)+'</strong></span></div></div>';
+  });
+  c.innerHTML=h;
+}
+function renderAccuracy(){
+  const c=$('settingsAccuracy'),sc=getAccuracyScores();
+  if(!sc.months){c.style.display='none';return}
+  c.style.display='block';
+  const circ=2*Math.PI*22,dash=(sc.overall/100*circ).toFixed(1);
+  const col=sc.overall>=70?'var(--accent)':sc.overall>=40?'var(--orange)':'var(--red)';
+  let h='<div class="card-title">予測精度</div>';
+  h+='<div style="display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:10px">';
+  h+='<div style="position:relative;width:56px;height:56px;flex-shrink:0"><svg viewBox="0 0 56 56" width="56" height="56" style="transform:rotate(-90deg)"><circle cx="28" cy="28" r="22" fill="none" stroke="var(--bg)" stroke-width="5"/><circle cx="28" cy="28" r="22" fill="none" stroke="'+col+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+dash+' '+circ+'"/></svg>';
+  h+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-num);font-size:.95rem;font-weight:700;color:'+col+'">'+sc.overall+'%</div></div>';
+  h+='<div><div style="font-size:.75rem;color:var(--text2)">全体の精度</div><div style="font-family:var(--font-num);font-size:1.1rem;font-weight:700;color:'+col+'">'+sc.overall+' / 100</div>';
+  h+='<div style="font-size:.65rem;color:var(--text3)">確定月: '+sc.months+'ヶ月</div></div></div>';
+  const entries=Object.entries(sc.categories).sort((a,b)=>b[1]-a[1]);
+  if(entries.length){h+='<div style="display:flex;flex-direction:column;gap:6px">';
+    entries.forEach(([name,score])=>{const sc2=score>=70?'var(--accent)':score>=40?'var(--orange)':'var(--red)';
+    h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:.75rem;color:var(--text2);width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>';
+    h+='<div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:'+score+'%;height:100%;border-radius:3px;background:'+sc2+'"></div></div>';
+    h+='<span style="font-family:var(--font-num);font-size:.72rem;font-weight:600;color:'+sc2+';width:32px;text-align:right">'+score+'%</span></div>'});
+  h+='</div>'}
+  h+='<div style="font-size:.65rem;color:var(--text3);margin-top:10px;line-height:1.4">確定月が増えるほど予測が正確になります。3ヶ月以上で予算の自動提案が有効になります。</div>';
+  c.innerHTML=h;
 }
 
 // ===== BUDGET NOTIFICATIONS =====

@@ -427,6 +427,12 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">残高予測</div>
       <div style="height:80px" id="homeMiniChart"></div>
     </div>
+
+    <div class="section-header" style="margin-top:8px">
+      <span class="section-title">最近の支出</span>
+    </div>
+    <div id="homeTimeline"></div>
+    <div id="homeTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
   </div>
 
   <!-- Page 2: Record -->
@@ -448,10 +454,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 
     <div class="section-header">
       <span class="section-title" id="analysisMonth">カテゴリ別予算</span>
-      <button class="btn-edit-budget" id="btnEditBudgets" aria-label="Edit budgets">
-        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <span>編集</span>
-      </button>
     </div>
     <div id="budgetCards"></div>
 
@@ -637,6 +639,15 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="card-title">変動費（月の予算）</div>
       <div id="varList"></div>
       <button class="add-btn" id="btnAddVar">+ 変動費を追加</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">カテゴリ予算</div>
+      <p style="font-size:.72rem;color:var(--text3);margin-bottom:10px">カテゴリごとの月間予算を設定します</p>
+      <button class="btn-secondary" id="btnEditBudgets" style="width:100%;padding:12px;font-size:.85rem">
+        <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:middle;margin-right:4px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        カテゴリ予算を編集
+      </button>
     </div>
 
     <!-- Theme & Data -->
@@ -836,6 +847,21 @@ font-size:.75rem;font-weight:600;transition:all .2s;
   </div>
 </div>
 
+<!-- Settle Modal -->
+<div class="modal-overlay" id="modalSettle">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 style="font-size:1rem;margin-bottom:16px">今月を確定する</h3>
+    <div id="settleInfo"></div>
+    <div class="form-group" style="margin-top:12px">
+      <label class="form-label">実際の残高（銀行残高を確認してください）</label>
+      <input type="number" inputmode="decimal" class="form-input" id="settleBalance" placeholder="0" max="999900000000" style="font-size:1.1rem;height:50px;text-align:center">
+    </div>
+    <div id="settleDiff" style="display:none;margin-bottom:12px"></div>
+    <button class="btn-primary" id="btnSettleConfirm">確定する</button>
+  </div>
+</div>
+
 <script>
 (function(){
 'use strict';
@@ -880,7 +906,7 @@ function defaultData(){
       {id:'c16',group:2,name:'副業関連',amount:0,icon:'💼',color:'#7C3AED'},
       {id:'c17',group:2,name:'その他',amount:0,icon:'📝',color:'#6B7280'}
     ],
-    spending:[],spendingArchive:{},
+    spending:[],spendingArchive:{},settledMonths:{},
     settings:{darkMode:false,notifications:false}
   };
 }
@@ -890,7 +916,7 @@ function loadData(){
   try{
     const raw=localStorage.getItem(SK);
     if(raw){const p=JSON.parse(raw);data=Object.assign(defaultData(),p);data.income=Object.assign(defaultData().income,p.income||{});data.expenses=Object.assign(defaultData().expenses,p.expenses||{});data.balance=Object.assign(defaultData().balance,p.balance||{});data.settings=Object.assign(defaultData().settings,p.settings||{});
-    if(!Array.isArray(data.expenses.fixed))data.expenses.fixed=[];if(!Array.isArray(data.expenses.variable))data.expenses.variable=[];if(!Array.isArray(data.income.bonusMonths))data.income.bonusMonths=[4,10];if(!Array.isArray(data.spending))data.spending=[];if(!data.spendingArchive||typeof data.spendingArchive!=='object')data.spendingArchive={};
+    if(!Array.isArray(data.expenses.fixed))data.expenses.fixed=[];if(!Array.isArray(data.expenses.variable))data.expenses.variable=[];if(!Array.isArray(data.income.bonusMonths))data.income.bonusMonths=[4,10];if(!Array.isArray(data.spending))data.spending=[];if(!data.spendingArchive||typeof data.spendingArchive!=='object')data.spendingArchive={};if(!data.settledMonths||typeof data.settledMonths!=='object')data.settledMonths={};
     // Migrate old budgets or v1 categories to v2 categories
     const def=defaultData().categories;
     let needsMigration=false;
@@ -1016,7 +1042,7 @@ function goToPage(idx){
     $(pageIds[idx]).classList.add('active');
   }
   $$('.tab-btn').forEach((b,i)=>{b.classList.toggle('active',i===idx)});
-  renderFns[idx]();
+  if(renderFns[idx])renderFns[idx]();
 }
 
 function initNav(){
@@ -1130,6 +1156,7 @@ function renderHome(){
   renderMonthlySummary();
   // Mini chart
   renderMiniChart();
+  renderTimeline('homeTimeline','homeTimelineEmpty');
 }
 
 function renderPace(totalBudget,totalSpent,daysLeft){
@@ -1388,16 +1415,28 @@ function renderRecord(){
       const rem=info.budget-info.spent,daily=rem>0?Math.floor(rem/daysLeft):0;
       const pct=info.budget>0?Math.round(info.spent/info.budget*100):(info.spent>0?100:0);
       const cls=pct>100?'over':pct>80?'warn':'ok',col=b.color||catColor(b.name);
+      const remColor=rem<0?'var(--red)':rem<info.budget*0.2?'var(--orange)':'var(--accent)';
       h+='<div class="budget-card"><div class="budget-header"><span class="budget-name" style="display:flex;align-items:center;gap:6px"><span style="font-size:.85rem">'+b.icon+'</span><span style="width:10px;height:10px;border-radius:3px;background:'+col+'"></span>'+b.name+'</span>';
-      h+='<span class="budget-remaining" style="color:'+(rem<0?'var(--red)':'var(--text)')+'">'+fmt(rem)+'</span></div>';
+      h+='<span style="font-family:var(--font-num);font-size:.82rem;font-weight:700;color:'+remColor+'">残り '+fmt(rem)+'</span></div>';
       h+='<div class="budget-bar"><div class="budget-fill '+cls+'" style="width:'+Math.min(pct,100)+'%"></div></div>';
-      h+='<div class="budget-meta"><span>'+fmt(info.spent)+' / '+fmt(info.budget)+'</span><span>1日 '+fmt(daily)+'</span></div></div>';
+      h+='<div class="budget-meta"><span>'+fmt(info.spent)+' 使用済み</span><span>1日 '+fmt(daily)+'</span></div></div>';
     });
   });
   c.innerHTML=h;
   renderDonut();
   renderDailyChart();
   renderTimeline('recordTimeline','recordTimelineEmpty');
+  // Settle button status
+  const settleKey=cY()+'-'+String(cM()).padStart(2,'0');
+  const isSettled=data.settledMonths[settleKey];
+  const stBtn=$('btnSettle');
+  if(isSettled){
+    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>確定済み（残高: '+fmt(isSettled.balance)+'）';
+    stBtn.style.opacity='.5';stBtn.style.pointerEvents='none';stBtn.style.borderStyle='solid';
+  }else{
+    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>今月を確定する';
+    stBtn.style.opacity='1';stBtn.style.pointerEvents='auto';
+  }
 }
 
 function renderDailyChart(){
@@ -1868,7 +1907,7 @@ function initBudget(){
     $$('#budgetEditList .be-name').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.name=inp.value.trim()||c.name});
     $$('#budgetEditList .be-icon').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.icon=inp.value.trim()||c.icon});
     $$('#budgetEditList .be-color').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.color=inp.value});
-    saveNow();renderRecord();hideModal('modalBudget');
+    saveNow();renderRecord();renderHome();hideModal('modalBudget');
   });
 }
 function renderBudgetGroupTabs(){
@@ -1891,6 +1930,48 @@ function renderBudgetEdit(){
     +'<button class="exp-del be-del" data-id="'+b.id+'" style="width:28px;height:28px;font-size:.85rem">×</button>';
   c.appendChild(d)});
   c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{const cat=data.categories.find(b=>b.id===btn.dataset.id);if(cat&&confirm('「'+cat.name+'」を削除？')){data.categories=data.categories.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
+}
+
+// ===== SETTLE =====
+function initSettle(){
+  $('btnSettle').addEventListener('click',()=>{
+    const cy=cY(),cm=cM(),key=cy+'-'+String(cm).padStart(2,'0');
+    if(data.settledMonths[key])return;
+    const inc=getIncome(cy,cm);
+    const expFixed=data.expenses.fixed.reduce((s,f)=>{if(f.isLoan&&isLoanPaid(f,cy,cm))return s;return s+(f.amount||0)},0);
+    const spentVar=getTotalSpending();
+    const expected=(data.balance.current||0)+inc-expFixed-spentVar;
+    let info='<div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:4px">';
+    info+='<div style="font-size:.78rem;font-weight:600;margin-bottom:8px">'+cm+'月の収支</div>';
+    info+='<div class="fc-line"><span class="fc-name">月初残高</span><span class="fc-val">'+fmt(data.balance.current)+'</span></div>';
+    info+='<div class="fc-line"><span class="fc-name">収入</span><span class="fc-val" style="color:var(--green)">'+fmt(inc)+'</span></div>';
+    info+='<div class="fc-line"><span class="fc-name">固定費</span><span class="fc-val" style="color:var(--red)">'+fmt(expFixed)+'</span></div>';
+    info+='<div class="fc-line"><span class="fc-name">記録済み支出</span><span class="fc-val" style="color:var(--red)">'+fmt(spentVar)+'</span></div>';
+    info+='<div style="border-top:1.5px solid var(--border);padding-top:8px;margin-top:8px;display:flex;justify-content:space-between">';
+    info+='<span style="font-weight:600;font-size:.88rem">予想残高</span>';
+    info+='<span style="font-family:var(--font-num);font-weight:700;font-size:1.05rem;color:var(--accent)">'+fmt(expected)+'</span></div></div>';
+    $('settleInfo').innerHTML=info;
+    $('settleBalance').value='';$('settleDiff').style.display='none';
+    $('settleBalance').dataset.expected=expected;
+    showModal('modalSettle');setTimeout(()=>$('settleBalance').focus(),300);
+  });
+  $('settleBalance').addEventListener('input',()=>{
+    const actual=parseFloat($('settleBalance').value),expected=parseFloat($('settleBalance').dataset.expected),el=$('settleDiff');
+    if(isNaN(actual)){el.style.display='none';return}
+    el.style.display='block';const delta=actual-expected;
+    if(Math.abs(delta)<1){el.innerHTML='<div style="padding:12px;background:var(--green-soft);border-radius:var(--radius-sm);text-align:center"><div style="font-size:.85rem;font-weight:600;color:var(--accent)">予想通りです</div></div>'}
+    else{const label=delta<0?'把握外の支出があります':'予想より多く残っています';const c=delta<0?'var(--red)':'var(--accent)';
+    el.innerHTML='<div style="padding:12px;background:'+(delta<0?'var(--red-soft)':'var(--green-soft)')+';border-radius:var(--radius-sm);text-align:center"><div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">'+label+'</div><div style="font-family:var(--font-num);font-size:1.3rem;font-weight:700;color:'+c+'">'+fmtS(delta)+'</div></div>'}
+  });
+  $('btnSettleConfirm').addEventListener('click',()=>{
+    const actual=parseFloat($('settleBalance').value);
+    if(isNaN(actual)){alert('残高を入力してください');return}
+    if(!confirm('今月を確定しますか？残高が '+fmt(actual)+' に更新されます。'))return;
+    const expected=parseFloat($('settleBalance').dataset.expected),cy=cY(),cm=cM(),key=cy+'-'+String(cm).padStart(2,'0');
+    data.settledMonths[key]={balance:Math.round(actual),expected:Math.round(expected),diff:Math.round(actual-expected),settledAt:new Date().toISOString()};
+    data.balance.current=clampAmt(actual);data.balance.lastUpdated=key;
+    saveNow();hideModal('modalSettle');renderRecord();renderHome();
+  });
 }
 
 // ===== BUDGET NOTIFICATIONS =====
@@ -1978,7 +2059,7 @@ function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.registe
 // ===== INIT =====
 function init(){
   loadData();autoCarryover();
-  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initVarModal();initBudget();initForecast();initCalendar();initSettings();regSW();
+  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initVarModal();initBudget();initForecast();initCalendar();initSettings();initSettle();regSW();
   goToPage(0);
   setTimeout(checkBudgetAlerts,2000);
 }

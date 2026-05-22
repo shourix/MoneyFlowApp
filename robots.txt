@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shourix.github.io/MoneyFlowApp/sitemap.xml

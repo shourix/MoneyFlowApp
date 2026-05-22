@@ -1431,11 +1431,11 @@ function renderRecord(){
   const isSettled=data.settledMonths[settleKey];
   const stBtn=$('btnSettle');
   if(isSettled){
-    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>確定済み（残高: '+fmt(isSettled.balance)+'）';
-    stBtn.style.opacity='.5';stBtn.style.pointerEvents='none';stBtn.style.borderStyle='solid';
+    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>確定済み（残高: '+fmt(isSettled.balance)+'） — 取り消す';
+    stBtn.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px solid var(--text3);border-radius:var(--radius-sm);color:var(--text2);font-size:.85rem;font-weight:600;background:var(--bg);cursor:pointer';
   }else{
     stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>今月を確定する';
-    stBtn.style.opacity='1';stBtn.style.pointerEvents='auto';
+    stBtn.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer';
   }
 }
 
@@ -1841,6 +1841,8 @@ function initInput(){
     setTimeout(()=>$('inpSpendAmt').focus(),300);
   });
   $('btnSpendSave').addEventListener('click',()=>{
+    const sk=cY()+'-'+String(cM()).padStart(2,'0');
+    if(data.settledMonths[sk]){alert('今月は確定済みです。記録ページから確定を取り消してください。');hideModal('modalInput');return}
     const amt=clampAmt(parseFloat($('inpSpendAmt').value));if(!amt||amt<=0)return $('inpSpendAmt').focus();
     const cat=$('inpSpendCat').value;if(!cat)return;
     data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:cat,memo:$('inpSpendMemo').value.trim()});
@@ -1854,6 +1856,8 @@ let editingSpendId=null;
 function openSpendEdit(id){
   const s=data.spending.find(x=>x.id===id);
   if(!s)return;
+  const sd=new Date(s.date),sk=sd.getFullYear()+'-'+String(sd.getMonth()+1).padStart(2,'0');
+  if(data.settledMonths[sk]){alert('確定済みの月の支出は編集できません。');return}
   editingSpendId=id;
   $('editSpendAmt').value=s.amount||'';
   $('editSpendMemo').value=s.memo||'';
@@ -1893,7 +1897,7 @@ function initSpendEdit(){
 
 // ===== BALANCE MODAL =====
 function initBalance(){
-  $('btnEditBalance').addEventListener('click',()=>{$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
+  $('btnEditBalance').addEventListener('click',()=>{const sk=cY()+'-'+String(cM()).padStart(2,'0');if(data.settledMonths[sk]){alert('今月は確定済みです。確定を取り消してから残高を変更してください。');return}$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
   $('btnBalanceSave').addEventListener('click',()=>{data.balance.current=clampAmt(parseFloat($('inpBalance').value));data.balance.lastUpdated=cY()+'-'+String(cM()).padStart(2,'0');saveNow();renderHome();hideModal('modalBalance')});
 }
 
@@ -1936,7 +1940,12 @@ function renderBudgetEdit(){
 function initSettle(){
   $('btnSettle').addEventListener('click',()=>{
     const cy=cY(),cm=cM(),key=cy+'-'+String(cm).padStart(2,'0');
-    if(data.settledMonths[key])return;
+    if(data.settledMonths[key]){
+      if(!confirm('確定を取り消しますか？'))return;
+      delete data.settledMonths[key];
+      saveNow();renderRecord();renderHome();
+      return;
+    }
     const inc=getIncome(cy,cm);
     const expFixed=data.expenses.fixed.reduce((s,f)=>{if(f.isLoan&&isLoanPaid(f,cy,cm))return s;return s+(f.amount||0)},0);
     const spentVar=getTotalSpending();

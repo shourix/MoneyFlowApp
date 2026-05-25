@@ -91,18 +91,6 @@ gap:2px;color:var(--text3);transition:color .2s;position:relative;
 .tab-btn span{font-size:.62rem;font-weight:500}
 .tab-btn.active{color:var(--accent)}
 
-/* FAB */
-.fab{
-position:fixed;z-index:60;
-bottom:calc(var(--bottom-h) + var(--safe-bottom) + 14px);
-right:20px;width:56px;height:56px;border-radius:50%;
-background:linear-gradient(135deg,var(--accent),var(--accent2));
-color:#fff;font-size:28px;font-weight:300;
-display:flex;align-items:center;justify-content:center;
-box-shadow:0 4px 20px rgba(20,184,166,.3);
-transition:transform .15s,box-shadow .15s;
-}
-.fab:active{transform:scale(.92);box-shadow:0 2px 10px rgba(20,184,166,.2)}
 
 /* Cards */
 .card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--card-shadow);transition:background .3s}
@@ -119,33 +107,7 @@ transition:transform .15s,box-shadow .15s;
 .summary-label{font-size:.68rem;color:var(--text3);margin-bottom:4px}
 .summary-val{font-family:var(--font-num);font-size:1rem;font-weight:600}
 
-/* Daily Budget Hero */
-.daily-hero{
-background:linear-gradient(135deg,var(--accent),var(--accent2));
-border-radius:var(--radius);padding:24px;margin-bottom:14px;
-text-align:center;color:#fff;
-}
-.daily-hero .label{font-size:.8rem;opacity:.85;margin-bottom:4px}
-.daily-hero .amount{font-family:var(--font-num);font-size:2.4rem;font-weight:700;letter-spacing:-.02em}
-.daily-hero .sub{font-size:.78rem;opacity:1;margin-top:6px;background:rgba(255,255,255,.18);display:inline-block;padding:3px 12px;border-radius:20px;letter-spacing:.02em}
 
-/* Timeline */
-.timeline-day{margin-bottom:16px}
-.timeline-date{font-size:.72rem;font-weight:600;color:var(--text3);margin-bottom:8px;padding-left:4px}
-.timeline-item{
-display:flex;align-items:center;gap:12px;
-padding:12px;background:var(--card);border-radius:var(--radius-sm);
-margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.03);
-}
-.tl-cat{
-width:36px;height:36px;border-radius:10px;flex-shrink:0;
-display:flex;align-items:center;justify-content:center;
-font-size:.9rem;font-weight:700;color:#fff;
-}
-.tl-body{flex:1;min-width:0}
-.tl-memo{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tl-time{font-size:.65rem;color:var(--text3)}
-.tl-amount{font-family:var(--font-num);font-size:.95rem;font-weight:600;color:var(--red);white-space:nowrap}
 
 /* Form Elements */
 .form-group{margin-bottom:14px}
@@ -168,18 +130,6 @@ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/sv
 background-repeat:no-repeat;background-position:right 14px center;
 }
 
-/* Budget Card */
-.budget-card{background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)}
-.budget-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.budget-name{font-size:.88rem;font-weight:600}
-.budget-remaining{font-family:var(--font-num);font-size:.85rem;font-weight:600}
-.budget-bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:6px}
-.budget-fill{height:100%;border-radius:3px;transition:width .4s}
-.budget-fill.ok{background:var(--accent)}
-.budget-fill.warn{background:var(--orange)}
-.budget-fill.over{background:var(--red)}
-.budget-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text3)}
-.budget-meta span:last-child{font-family:var(--font-num)}
 
 /* Expense Item */
 .exp-item{
@@ -312,15 +262,6 @@ background:var(--bg);transition:all .2s;
 .icon-btn:active{transform:scale(.9);background:var(--accent-soft)}
 .icon-btn svg{width:16px;height:16px;stroke:var(--text2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* Budget Edit Button */
-.btn-edit-budget{
-display:flex;align-items:center;gap:4px;
-padding:6px 14px;border-radius:20px;
-background:var(--green-soft);color:var(--green);
-font-size:.75rem;font-weight:600;transition:all .2s;
-}
-.btn-edit-budget svg{width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.btn-edit-budget:active{transform:scale(.95);opacity:.8}
 
 /* Deduction Display */
 .ded-line{display:flex;justify-content:space-between;padding:3px 0;font-size:.8rem}
@@ -347,11 +288,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--text3);border-radius:2px;opacity:.3}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.grp-btn{padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.7rem;font-weight:600;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s}
-.grp-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.cat-chip{display:flex;align-items:center;gap:4px;padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;font-size:.72rem;font-weight:500;color:var(--text2);background:var(--card);cursor:pointer;transition:all .15s}
-.cat-chip.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
 
 /* Calendar */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
@@ -411,90 +347,14 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       </div>
     </div>
 
-    <div class="daily-hero">
-      <div class="label">1日に使える金額</div>
-      <div class="amount" id="homeDailyBudget">¥0</div>
-      <div class="sub" id="homeDailySub">残り0日 / 予算残 ¥0</div>
-    </div>
-
-    <div id="homeSuggestions" style="margin-bottom:14px"></div>
-
-    <!-- Pace Indicator -->
-    <div class="card" id="homePace" style="display:flex;align-items:center;gap:18px;padding:18px"></div>
-
-    <!-- Monthly Summary -->
-    <div class="card" id="homeMonthlySummary" style="padding:16px 18px"></div>
-
     <!-- Mini Chart -->
     <div class="card" style="padding:16px 18px">
       <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">残高予測</div>
       <div style="height:80px" id="homeMiniChart"></div>
     </div>
-
-    <div class="section-header" style="margin-top:8px">
-      <span class="section-title">最近の支出</span>
-    </div>
-    <div id="homeTimeline"></div>
-    <div id="homeTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
   </div>
 
-  <!-- Page 2: Record -->
-  <div class="page" id="pageRecord">
-    <div style="text-align:center;margin-bottom:12px">
-      <h2 style="font-size:1.05rem;font-weight:700" id="recordMonth">5月の家計簿</h2>
-    </div>
-
-    <!-- Daily spending bar chart (7 days) -->
-    <div class="card card-sm" style="margin-bottom:14px">
-      <div class="card-title">日別支出（直近7日）</div>
-      <div style="height:120px" id="recordDailyChart"></div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:8px;background:var(--accent-soft);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;font-size:.72rem;color:var(--accent);font-weight:500">
-      <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      支出を記録すると予測にリアルタイム反映されます
-    </div>
-
-    <div class="section-header">
-      <span class="section-title" id="analysisMonth">カテゴリ別予算</span>
-    </div>
-    <div id="budgetCards"></div>
-
-    <div class="card card-sm" style="margin-top:8px">
-      <div class="card-title">支出内訳</div>
-      <div style="position:relative;width:140px;height:140px;margin:0 auto">
-        <svg id="donutChart" viewBox="0 0 140 140" width="140" height="140"></svg>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
-          <div style="font-family:var(--font-num);font-size:1rem;font-weight:600" id="donutTotal">¥0</div>
-          <div style="font-size:.6rem;color:var(--text3)">今月の支出</div>
-        </div>
-      </div>
-      <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;font-size:.68rem"></div>
-    </div>
-
-    <div class="card card-sm" style="margin-top:8px">
-      <div class="collapse-header" data-target="trendBody">
-        <h3>トレンド分析</h3>
-        <svg class="collapse-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="collapse-body" id="trendBody">
-        <div style="padding-top:8px" id="trendContent"></div>
-      </div>
-    </div>
-
-    <div class="section-header" style="margin-top:8px">
-      <span class="section-title">最近の支出</span>
-    </div>
-    <div id="recordTimeline"></div>
-    <div id="recordTimelineEmpty" class="empty" style="display:none">まだ記録がありません</div>
-
-    <button id="btnSettle" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      今月を確定する
-    </button>
-  </div>
-
-  <!-- Page 3: Forecast -->
+  <!-- Page 2: Forecast -->
   <div class="page" id="pageForecast">
     <div class="month-nav">
       <button class="nav-btn" id="btnPrevMonth"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -593,7 +453,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     </div>
   </div>
 
-  <!-- Page 4: Calendar -->
+  <!-- Page 3: Calendar -->
   <div class="page" id="pageCalendar">
     <div class="month-nav">
       <button class="nav-btn" id="calPrev"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -607,7 +467,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <div id="calLegend" style="display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;margin-top:14px;font-size:.68rem"></div>
   </div>
 
-  <!-- Page 5: Settings -->
+  <!-- Page 4: Settings -->
   <div class="page" id="pageSettings">
     <!-- Income -->
     <div class="card">
@@ -654,16 +514,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <button class="add-btn" id="btnAddVar">+ 変動費を追加</button>
     </div>
 
-    <div class="card">
-      <div class="card-title">カテゴリ予算</div>
-      <p style="font-size:.72rem;color:var(--text3);margin-bottom:10px">カテゴリごとの月間予算を設定します</p>
-      <button class="btn-secondary" id="btnEditBudgets" style="width:100%;padding:12px;font-size:.85rem">
-        <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:middle;margin-right:4px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        カテゴリ予算を編集
-      </button>
-    </div>
-
-    <div class="card card-sm" id="settingsAccuracy" style="display:none"></div>
 
     <!-- Theme & Data -->
     <div class="card">
@@ -671,13 +521,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
       <div class="toggle-row">
         <span style="font-size:.88rem">ダークモード</span>
         <div class="toggle-track" id="toggleDark"><div class="toggle-thumb"></div></div>
-      </div>
-      <div class="toggle-row" id="notifRow" style="margin-top:10px">
-        <div>
-          <span style="font-size:.88rem">予算アラート通知</span>
-          <div style="font-size:.68rem;color:var(--text3);margin-top:2px">週の予算超過・月半ばのペース警告</div>
-        </div>
-        <div class="toggle-track" id="toggleNotif"><div class="toggle-thumb"></div></div>
       </div>
       <div style="margin-top:12px">
         <div class="backup-row">
@@ -709,46 +552,19 @@ font-size:.75rem;font-weight:600;transition:all .2s;
     <span>ホーム</span>
   </button>
   <button class="tab-btn" data-idx="1">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-    <span>記録</span>
-  </button>
-  <button class="tab-btn" data-idx="2">
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     <span>予測</span>
   </button>
-  <button class="tab-btn" data-idx="3">
+  <button class="tab-btn" data-idx="2">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span>カレンダー</span>
   </button>
-  <button class="tab-btn" data-idx="4">
+  <button class="tab-btn" data-idx="3">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     <span>設定</span>
   </button>
 </nav>
 
-<!-- FAB -->
-<button class="fab" id="fab" aria-label="支出を入力">+</button>
-
-<!-- Input Modal -->
-<div class="modal-overlay" role="dialog" id="modalInput">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:16px">支出を記録</h3>
-    <div class="form-group">
-      <input type="number" inputmode="decimal" class="form-input" id="inpSpendAmt" placeholder="金額" style="font-size:1.3rem;height:56px;text-align:center" max="999900000000">
-    </div>
-    <div class="form-group">
-      <label class="form-label" style="font-size:.72rem;margin-bottom:6px">カテゴリ</label>
-      <div id="inpGroupBtns" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap"></div>
-      <div id="inpCatGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <input type="hidden" id="inpSpendCat">
-    </div>
-    <div class="form-group">
-      <input type="text" class="form-input" id="inpSpendMemo" placeholder="メモ（任意）" style="height:44px;font-size:.88rem">
-    </div>
-    <button class="btn-primary" id="btnSpendSave">記録する</button>
-  </div>
-</div>
 
 <!-- Balance Edit Modal -->
 <div class="modal-overlay" role="dialog" id="modalBalance">
@@ -819,73 +635,7 @@ font-size:.75rem;font-weight:600;transition:all .2s;
   </div>
 </div>
 
-<!-- Budget Edit Modal -->
-<div class="modal-overlay" role="dialog" id="modalBudget">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:12px">カテゴリ予算を編集</h3>
-    <div id="budgetGroupTabs" style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap"></div>
-    <div id="budgetEditList" style="max-height:320px;overflow-y:auto"></div>
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <input type="text" class="form-input" id="newCatName" placeholder="新しいカテゴリ名" style="flex:1;height:40px;font-size:.85rem">
-      <button class="btn-secondary" id="btnAddCat" style="height:40px;padding:0 14px">追加</button>
-    </div>
-    <button class="btn-primary" style="margin-top:12px" id="btnBudgetSave">保存</button>
-  </div>
-</div>
 
-<!-- Spending Edit Modal -->
-<div class="modal-overlay" role="dialog" id="modalSpendEdit">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:16px">支出を編集</h3>
-    <div class="form-group">
-      <label class="form-label">金額</label>
-      <input type="number" inputmode="decimal" class="form-input" id="editSpendAmt" placeholder="金額" style="font-size:1.1rem;height:50px;text-align:center" max="999900000000">
-    </div>
-    <div class="form-group">
-      <label class="form-label" style="font-size:.72rem;margin-bottom:6px">カテゴリ</label>
-      <div id="editGroupBtns" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap"></div>
-      <div id="editCatGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <input type="hidden" id="editSpendCat">
-    </div>
-    <div class="form-group">
-      <label class="form-label">メモ</label>
-      <input type="text" class="form-input" id="editSpendMemo" placeholder="メモ（任意）" style="height:44px;font-size:.88rem">
-    </div>
-    <div class="form-group">
-      <label class="form-label">日付</label>
-      <input type="date" class="form-input" id="editSpendDate" style="height:44px;font-size:.88rem">
-    </div>
-    <button class="btn-primary" id="btnSpendEditSave">保存</button>
-    <button id="btnSpendEditDelete" aria-label="支出を削除" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;margin-top:8px;border:1.5px solid var(--red);border-radius:var(--radius-sm);background:var(--red-soft);color:var(--red);font-size:.85rem;font-weight:600;cursor:pointer">削除する</button>
-  </div>
-</div>
-
-<!-- Settle Modal -->
-<div class="modal-overlay" role="dialog" id="modalSettle">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:16px">今月を確定する</h3>
-    <div id="settleInfo"></div>
-    <div class="form-group" style="margin-top:12px">
-      <label class="form-label">実際の残高（銀行残高を確認してください）</label>
-      <input type="number" inputmode="decimal" class="form-input" id="settleBalance" placeholder="0" max="999900000000" style="font-size:1.1rem;height:50px;text-align:center">
-    </div>
-    <div id="settleDiff" style="display:none;margin-bottom:12px"></div>
-    <button class="btn-primary" id="btnSettleConfirm">確定する</button>
-  </div>
-</div>
-
-<!-- Suggestion Modal -->
-<div class="modal-overlay" role="dialog" id="modalSuggestion">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 style="font-size:1rem;margin-bottom:4px">予算の提案</h3>
-    <p style="font-size:.72rem;color:var(--text2);margin-bottom:16px">直近3ヶ月の実績をもとに予算を最適化します</p>
-    <div id="suggestionList"></div>
-  </div>
-</div>
 
 <script>
 (function(){
@@ -893,9 +643,6 @@ font-size:.75rem;font-weight:600;transition:all .2s;
 
 // ===== DATA =====
 const SK = 'moneyflow_data';
-const GROUP_NAMES={1:'毎月の生活費',2:'不定期の支出'};
-function catColor(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.color:'#6B7280'}
-function catIcon(c){const cat=data.categories.find(x=>x.name===c);return cat?cat.icon:'📦'}
 
 const CAL_GROUPS=[
   {key:'rent',name:'家賃・管理費',color:'#E24B4A'},
@@ -1017,19 +764,16 @@ function getIncomeBreakdown(tY,tM,otOv,sideOv){
 }
 function isLoanPaid(l,tY,tM){if(!l.isLoan||!l.remainingCount)return false;const s=l.startDate?new Date(l.startDate):now(),d=mDiff(s.getFullYear(),s.getMonth()+1,tY,tM);return d>=l.remainingCount}
 function loanPayoff(l){if(!l.isLoan||!l.remainingCount)return null;const s=l.startDate?new Date(l.startDate):now();return addM(s.getFullYear(),s.getMonth()+1,l.remainingCount)}
-function getExpense(tY,tM,useActual){
+function getExpense(tY,tM){
   let t=0;for(const f of data.expenses.fixed){if(f.isLoan&&isLoanPaid(f,tY,tM))continue;t+=f.amount||0}
-  if(useActual&&tY===cY()&&tM===cM()){t+=getTotalSpending()}else{for(const v of data.expenses.variable)t+=v.amount||0}
+  for(const v of data.expenses.variable)t+=v.amount||0;
   return t;
 }
-function getForecast(months,otOv,sideOv,useAct){
+function getForecast(months,otOv,sideOv){
   const cy=cY(),cm=cM(),r=[];let b=data.balance.current||0;
-  for(let i=0;i<months;i++){const{year,month}=addM(cy,cm,i);const inc=getIncome(year,month,i===0?otOv:undefined,i===0?sideOv:undefined);const exp=getExpense(year,month,useAct&&i===0);b+=inc-exp;r.push({year,month,income:inc,expense:exp,net:inc-exp,balance:b})}
+  for(let i=0;i<months;i++){const{year,month}=addM(cy,cm,i);const inc=getIncome(year,month,i===0?otOv:undefined,i===0?sideOv:undefined);const exp=getExpense(year,month);b+=inc-exp;r.push({year,month,income:inc,expense:exp,net:inc-exp,balance:b})}
   return r;
 }
-function getSpendingByCat(){const r={};data.categories.forEach(c=>{r[c.name]={budget:c.amount||0,spent:0,group:c.group}});data.spending.forEach(s=>{if(!r[s.category])r[s.category]={budget:0,spent:0,group:2};r[s.category].spent+=s.amount||0});return r}
-function getDaysLeft(){const n=now(),last=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();return Math.max(1,last-n.getDate()+1)}
-function getTotalSpending(){return data.spending.reduce((s,i)=>s+(i.amount||0),0)}
 
 // ===== AUTO CARRYOVER =====
 function autoCarryover(){
@@ -1041,9 +785,6 @@ function autoCarryover(){
   while(ly!==cy||lm!==cm){const{year:ny,month:nm}=addM(ly,lm,1);b+=getIncome(ly,lm)-getExpense(ly,lm);
   for(const f of data.expenses.fixed){if(f.isLoan&&f.remainingCount>0)f.remainingCount=Math.max(0,f.remainingCount-1)}ly=ny;lm=nm}
   data.balance.current=b;data.balance.lastUpdated=cur;
-  if(data.spending&&data.spending.length>0){const g={};data.spending.forEach(s=>{const d=new Date(s.date),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(!g[k])g[k]=[];g[k].push(s)});
-  Object.keys(g).forEach(k=>{if(k!==cur){if(!data.spendingArchive[k])data.spendingArchive[k]=[];data.spendingArchive[k]=data.spendingArchive[k].concat(g[k])}});
-  data.spending=data.spending.filter(s=>{const d=new Date(s.date);return d.getFullYear()===cy&&d.getMonth()+1===cm})}
   saveNow();
 }
 
@@ -1051,8 +792,8 @@ function autoCarryover(){
 const $=id=>document.getElementById(id),$$=s=>document.querySelectorAll(s);
 
 // ===== NAVIGATION =====
-let curPage=0;const pageIds=['pageHome','pageRecord','pageForecast','pageCalendar','pageSettings'];
-const renderFns=[renderHome,renderRecord,renderForecast,renderCalendar,renderSettings];
+let curPage=0;const pageIds=['pageHome','pageForecast','pageCalendar','pageSettings'];
+const renderFns=[renderHome,renderForecast,renderCalendar,renderSettings];
 function isMobile(){return window.innerWidth<=640}
 
 function goToPage(idx){
@@ -1166,69 +907,9 @@ function renderHome(){
   fitText($('homeBalance'),fmt(b),1.6,0.9);$('homeBalance').className='card-value '+(b>=0?'positive':'negative');
   fitText($('homeIncome'),fmt(inc),1.0,0.6);fitText($('homeExpense'),fmt(exp),1.0,0.6);
   fitText($('homeNet'),fmtS(net),1.0,0.6);$('homeNet').className='summary-val '+(net>=0?'positive':'negative');
-
-  // Daily budget
-  const byCat=getSpendingByCat(),daysLeft=getDaysLeft();
-  let totalBudget=0,totalSpent=0;
-  Object.values(byCat).forEach(v=>{totalBudget+=v.budget;totalSpent+=v.spent});
-  const remaining=totalBudget-totalSpent,daily=remaining>0?Math.floor(remaining/daysLeft):0;
-  fitText($('homeDailyBudget'),fmt(daily),2.4,1.2);
-  $('homeDailySub').textContent='残り'+daysLeft+'日 / 予算残 '+fmt(remaining);
-
-  // Pace indicator
-  renderPace(totalBudget,totalSpent,daysLeft);
-  // Monthly summary
-  renderMonthlySummary();
-  // Mini chart
   renderMiniChart();
-  renderTimeline('homeTimeline','homeTimelineEmpty');
-  renderSuggestionBanner();
 }
 
-function renderPace(totalBudget,totalSpent,daysLeft){
-  const c=$('homePace');
-  if(totalBudget<=0){c.style.display='none';return}
-  c.style.display='flex';
-  const n=now(),day=n.getDate(),lastDay=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
-  const budgetPct=Math.min(Math.round(totalSpent/totalBudget*100),100);
-  const timePct=Math.round(day/lastDay*100);
-  const circ=2*Math.PI*38,budgetDash=(budgetPct/100*circ).toFixed(1),timeDash=(timePct/100*circ).toFixed(1);
-  let color='var(--accent)',msgClass='ok',msg='順調なペースです';
-  if(budgetPct>timePct+15){color='var(--orange)';msgClass='warn';msg='消化ペースがやや速めです'}
-  if(budgetPct>90){color='var(--red)';msgClass='over';msg='予算残りわずかです'}
-  const msgBg=msgClass==='ok'?'var(--green-soft)':msgClass==='warn'?'var(--orange-soft)':'var(--red-soft)';
-  const msgColor=msgClass==='ok'?'var(--accent2)':msgClass==='warn'?'var(--orange)':'var(--red)';
-  c.innerHTML='<div style="position:relative;width:96px;height:96px;flex-shrink:0">'
-    +'<svg viewBox="0 0 96 96" width="96" height="96" style="transform:rotate(-90deg)">'
-    +'<circle cx="48" cy="48" r="38" fill="none" stroke="var(--bg)" stroke-width="7"/>'
-    +'<circle cx="48" cy="48" r="38" fill="none" stroke="var(--accent-soft)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+timeDash+' '+circ+'"/>'
-    +'<circle cx="48" cy="48" r="38" fill="none" stroke="'+color+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+budgetDash+' '+circ+'"/>'
-    +'</svg>'
-    +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">'
-    +'<div style="font-family:var(--font-num);font-size:1.2rem;font-weight:700;color:'+color+'">'+budgetPct+'%</div>'
-    +'<div style="font-size:.48rem;color:var(--text3)">予算消化</div></div></div>'
-    +'<div style="flex:1;min-width:0">'
-    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:'+color+'"></div><span style="font-size:.72rem;color:var(--text2)">予算消化 <strong style="font-family:var(--font-num);color:var(--text)">'+budgetPct+'%</strong></span></div>'
-    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent-soft)"></div><span style="font-size:.72rem;color:var(--text2)">経過日数 <strong style="font-family:var(--font-num);color:var(--text)">'+timePct+'%</strong>（'+day+'日目/'+lastDay+'日）</span></div>'
-    +'<div style="font-size:.68rem;padding:6px 10px;border-radius:8px;background:'+msgBg+';color:'+msgColor+';font-weight:500">'+msg+'</div></div>';
-}
-
-function renderMonthlySummary(){
-  const c=$('homeMonthlySummary'),cy=cY(),cm=cM();
-  let chips='';
-  // Show up to 3 previous months as "settled" if archive exists
-  for(let i=3;i>=1;i--){
-    const{year,month}=addM(cy,cm,-i);
-    const key=year+'-'+String(month).padStart(2,'0');
-    if(data.spendingArchive&&data.spendingArchive[key]){
-      chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:var(--green-soft);color:var(--accent);display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'+month+'月</span>';
-    }
-  }
-  chips+='<span style="font-size:.65rem;font-weight:600;padding:4px 10px;border-radius:8px;background:var(--orange-soft);color:var(--orange);display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite"></span>'+cm+'月 記録中</span>';
-  c.innerHTML='<div style="font-size:.78rem;font-weight:700;margin-bottom:10px">月次サマリー</div>'
-    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+chips+'</div>'
-    +'<div style="font-size:.65rem;color:var(--text3)">確定が増えるほど予測が正確になります</div>';
-}
 
 function renderMiniChart(){
   const c=$('homeMiniChart'),fc=getForecast(4);
@@ -1253,38 +934,6 @@ function renderMiniChart(){
   c.innerHTML=svg;
 }
 
-function renderTimeline(containerId,emptyId){
-  const c=$(containerId),empty=$(emptyId);
-  if(data.spending.length===0){c.innerHTML='';empty.style.display='block';return}
-  empty.style.display='none';
-  const sorted=[...data.spending].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const grouped={};
-  sorted.forEach(s=>{
-    const d=new Date(s.date),today=now(),y=d.getFullYear()===today.getFullYear()&&d.getMonth()===today.getMonth();
-    let label;
-    if(y&&d.getDate()===today.getDate())label='今日';
-    else if(y&&d.getDate()===today.getDate()-1)label='昨日';
-    else label=(d.getMonth()+1)+'/'+d.getDate();
-    if(!grouped[label])grouped[label]=[];
-    grouped[label].push(s);
-  });
-  let html='';
-  Object.entries(grouped).forEach(([label,items])=>{
-    html+='<div class="timeline-day"><div class="timeline-date">'+label+'</div>';
-    items.forEach(s=>{
-      const d=new Date(s.date),time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-      const col=catColor(s.category),ico=catIcon(s.category);
-      html+='<div class="timeline-item" data-spend-id="'+s.id+'" style="cursor:pointer"><div class="tl-cat" style="background:'+col+'">'+ico+'</div>';
-      html+='<div class="tl-body"><div class="tl-memo">'+(s.memo||s.category)+'</div><div class="tl-time">'+time+'</div></div>';
-      html+='<div class="tl-amount">'+fmt(s.amount)+'</div></div>';
-    });
-    html+='</div>';
-  });
-  c.innerHTML=html;
-  c.querySelectorAll('.timeline-item[data-spend-id]').forEach(el=>{
-    el.addEventListener('click',()=>openSpendEdit(el.dataset.spendId));
-  });
-}
 
 // ===== FORECAST =====
 let fcOffset=0,fcRange=3;
@@ -1423,100 +1072,6 @@ function buildChart(fc){
   s+='</svg>';return s;
 }
 
-// ===== RECORD =====
-function renderRecord(){
-  $('recordMonth').textContent=cM()+'月の家計簿';
-  $('analysisMonth').textContent='カテゴリ別予算';
-  const byCat=getSpendingByCat(),daysLeft=getDaysLeft(),c=$('budgetCards');
-  let h='';
-  [1,2].forEach(g=>{
-    const cats=data.categories.filter(x=>x.group===g);
-    if(!cats.length)return;
-    const hasActivity=cats.some(b=>{const info=byCat[b.name]||{budget:0,spent:0};return info.budget>0||info.spent>0});
-    if(!hasActivity)return;
-    h+='<div style="font-size:.68rem;font-weight:600;color:var(--text3);margin:10px 0 4px;padding-left:2px">'+g+'  '+GROUP_NAMES[g]+'</div>';
-    cats.forEach(b=>{
-      const info=byCat[b.name]||{budget:0,spent:0};
-      if(info.budget<=0&&info.spent<=0)return;
-      const rem=info.budget-info.spent,daily=rem>0?Math.floor(rem/daysLeft):0;
-      const pct=info.budget>0?Math.round(info.spent/info.budget*100):(info.spent>0?100:0);
-      const cls=pct>100?'over':pct>80?'warn':'ok',col=b.color||catColor(b.name);
-      const remColor=rem<0?'var(--red)':rem<info.budget*0.2?'var(--orange)':'var(--accent)';
-      h+='<div class="budget-card"><div class="budget-header"><span class="budget-name" style="display:flex;align-items:center;gap:6px"><span style="font-size:.85rem">'+b.icon+'</span><span style="width:10px;height:10px;border-radius:3px;background:'+col+'"></span>'+b.name+'</span>';
-      h+='<span style="font-family:var(--font-num);font-size:.82rem;font-weight:700;color:'+remColor+'">残り '+fmt(rem)+'</span></div>';
-      h+='<div class="budget-bar"><div class="budget-fill '+cls+'" style="width:'+Math.min(pct,100)+'%"></div></div>';
-      h+='<div class="budget-meta"><span>'+fmt(info.spent)+' 使用済み</span><span>1日 '+fmt(daily)+'</span></div></div>';
-    });
-  });
-  c.innerHTML=h;
-  renderDonut();
-  renderDailyChart();
-  renderTimeline('recordTimeline','recordTimelineEmpty');
-  renderTrends();
-  // Settle button status
-  const settleKey=cY()+'-'+String(cM()).padStart(2,'0');
-  const isSettled=data.settledMonths[settleKey];
-  const stBtn=$('btnSettle');
-  if(isSettled){
-    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>確定済み（残高: '+fmt(isSettled.balance)+'） — 取り消す';
-    stBtn.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px solid var(--text3);border-radius:var(--radius-sm);color:var(--text2);font-size:.85rem;font-weight:600;background:var(--bg);cursor:pointer';
-  }else{
-    stBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>今月を確定する';
-    stBtn.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;margin-top:16px;border:2px dashed var(--accent);border-radius:var(--radius-sm);color:var(--accent);font-size:.85rem;font-weight:600;background:var(--accent-soft);cursor:pointer';
-  }
-}
-
-function renderDailyChart(){
-  const c=$('recordDailyChart'),t=now();
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-i);
-    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const label=(d.getMonth()+1)+'/'+d.getDate();
-    const dayName=['日','月','火','水','木','金','土'][d.getDay()];
-    days.push({date:d,key,label,dayName,total:0});
-  }
-  data.spending.forEach(s=>{
-    const d=new Date(s.date);
-    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const day=days.find(x=>x.key===key);
-    if(day)day.total+=s.amount;
-  });
-  const maxV=Math.max(...days.map(d=>d.total),1);
-  const W=300,H=120,padL=40,padB=24,padT=6,padR=4;
-  const barArea=W-padL-padR,barW=barArea/7*0.6,gap=barArea/7*0.4;
-  let svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="100%" preserveAspectRatio="none">';
-  for(let i=0;i<=2;i++){
-    const y=padT+(H-padT-padB)*(i/2);
-    const val=maxV*(1-i/2);
-    svg+='<line x1="'+padL+'" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="var(--border)" stroke-width="0.5"/>';
-    svg+='<text x="'+(padL-4)+'" y="'+(y+3)+'" fill="var(--text3)" font-size="8" font-family="var(--font-num)" text-anchor="end">'+fmtShort(val)+'</text>';
-  }
-  days.forEach((d,i)=>{
-    const x=padL+i*(barArea/7)+(gap/2);
-    const bH=(d.total/maxV)*(H-padT-padB);
-    const y=H-padB-bH;
-    const isToday=i===6;
-    svg+='<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+bH+'" rx="3" fill="'+(isToday?'var(--accent)':'var(--accent)')+'" opacity="'+(isToday?'1':'0.5')+'"/>';
-    if(d.total>0)svg+='<text x="'+(x+barW/2)+'" y="'+(y-3)+'" fill="var(--text2)" font-size="7" font-family="var(--font-num)" text-anchor="middle">'+fmtShort(d.total)+'</text>';
-    svg+='<text x="'+(x+barW/2)+'" y="'+(H-12)+'" fill="'+(isToday?'var(--accent)':'var(--text3)')+'" font-size="8" font-family="var(--font-num)" text-anchor="middle" font-weight="'+(isToday?'700':'400')+'">'+d.label+'</text>';
-    svg+='<text x="'+(x+barW/2)+'" y="'+(H-3)+'" fill="var(--text3)" font-size="7" text-anchor="middle">'+d.dayName+'</text>';
-  });
-  svg+='</svg>';
-  c.innerHTML=svg;
-}
-
-function renderDonut(){
-  const byCat=getSpendingByCat(),svg=$('donutChart');svg.innerHTML='';
-  let total=0;const items=[];
-  Object.entries(byCat).forEach(([name,info])=>{if(info.spent>0){const cat=data.categories.find(c=>c.name===name);items.push({name,amount:info.spent,color:cat?cat.color:catColor(name),icon:cat?cat.icon:'📦'});total+=info.spent}});
-  fitText($('donutTotal'),fmt(total),1.0,0.6);
-  if(!total){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx','70');c.setAttribute('cy','70');c.setAttribute('r','50');c.setAttribute('fill','none');c.setAttribute('stroke','var(--bg)');c.setAttribute('stroke-width','14');svg.appendChild(c);$('donutLegend').innerHTML='';return}
-  const cx=70,cy=70,r=50,circ=2*Math.PI*r;let off=0;
-  items.forEach(i=>{const pct=i.amount/total,dl=pct*circ;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',r);c.setAttribute('fill','none');c.setAttribute('stroke',i.color);c.setAttribute('stroke-width','14');c.setAttribute('stroke-dasharray',dl+' '+(circ-dl));c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 70 70)');svg.appendChild(c);off+=dl});
-  let lg='';items.forEach(i=>{lg+='<span style="display:flex;align-items:center;gap:3px"><span style="font-size:.7rem">'+i.icon+'</span><span style="width:8px;height:8px;border-radius:2px;background:'+i.color+'"></span>'+i.name+' '+Math.round(i.amount/total*100)+'%</span>'});
-  $('donutLegend').innerHTML=lg;
-}
 
 // ===== SETTINGS =====
 function renderSettings(){
@@ -1525,7 +1080,6 @@ function renderSettings(){
   $('inpBonus').value=data.income.bonusAmount||'';
   $('inpSide').value=data.income.sideIncome||'';
   updateDedDisplay();renderFixedList();renderVarList();
-  renderAccuracy();
 }
 
 function updateDedDisplay(){
@@ -1548,20 +1102,6 @@ function initSettings(){
   const t=$('toggleDark');
   function updDark(){if(data.settings.darkMode){t.classList.add('on');document.documentElement.classList.add('dark')}else{t.classList.remove('on');document.documentElement.classList.remove('dark')}document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute('content',data.settings.darkMode?'#0F172A':'#F5F7FA'))}
   t.addEventListener('click',()=>{data.settings.darkMode=!data.settings.darkMode;updDark();saveData()});updDark();
-
-  // Notifications
-  const nt=$('toggleNotif'),nr=$('notifRow');
-  if(!('Notification' in window)){nr.style.display='none'}
-  function updNotif(){if(data.settings.notifications){nt.classList.add('on')}else{nt.classList.remove('on')}}
-  nt.addEventListener('click',async()=>{
-    if(!data.settings.notifications){
-      const perm=await Notification.requestPermission();
-      if(perm==='granted'){data.settings.notifications=true;updNotif();saveData();checkBudgetAlerts()}
-      else{alert('通知がブロックされています。ブラウザの設定から許可してください。')}
-    }else{
-      data.settings.notifications=false;updNotif();saveData();
-    }
-  });updNotif();
 
   // Export
   $('btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='moneyflow_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u)});
@@ -1837,385 +1377,16 @@ function initCalendar(){
   $('calNext').addEventListener('click',()=>{const r=addM(calYear,calMonth,1);calYear=r.year;calMonth=r.month;calSelectedDay=null;renderCalendar()});
 }
 
-// ===== INPUT MODAL (FAB) =====
-let inputSelectedGroup=1;
-function populateCatPicker(grpContainer,catContainer,hiddenInput,selectedCat){
-  grpContainer.innerHTML='';catContainer.innerHTML='';
-  [1,2].forEach(g=>{
-    const b=document.createElement('button');b.type='button';b.className='grp-btn'+(inputSelectedGroup===g?' active':'');
-    b.textContent=g+' '+GROUP_NAMES[g];
-    b.addEventListener('click',()=>{inputSelectedGroup=g;populateCatPicker(grpContainer,catContainer,hiddenInput,hiddenInput.value)});
-    grpContainer.appendChild(b);
-  });
-  const cats=data.categories.filter(c=>c.group===inputSelectedGroup);
-  cats.forEach(c=>{
-    const ch=document.createElement('button');ch.type='button';ch.className='cat-chip'+(c.name===selectedCat?' active':'');
-    ch.innerHTML='<span>'+c.icon+'</span>'+c.name;
-    ch.addEventListener('click',()=>{
-      hiddenInput.value=c.name;
-      catContainer.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
-      ch.classList.add('active');
-    });
-    catContainer.appendChild(ch);
-  });
-  if(!selectedCat&&cats.length){hiddenInput.value=cats[0].name;catContainer.querySelector('.cat-chip')?.classList.add('active')}
-}
-function initInput(){
-  $('fab').addEventListener('click',()=>{
-    $('inpSpendAmt').value='';$('inpSpendMemo').value='';$('inpSpendCat').value='';
-    inputSelectedGroup=1;
-    populateCatPicker($('inpGroupBtns'),$('inpCatGrid'),$('inpSpendCat'),'');
-    showModal('modalInput');
-    setTimeout(()=>$('inpSpendAmt').focus(),300);
-  });
-  $('btnSpendSave').addEventListener('click',()=>{
-    const sk=cY()+'-'+String(cM()).padStart(2,'0');
-    if(data.settledMonths[sk]){alert('今月は確定済みです。記録ページから確定を取り消してください。');hideModal('modalInput');return}
-    const amt=clampAmt(parseFloat($('inpSpendAmt').value));if(!amt||amt<=0)return $('inpSpendAmt').focus();
-    const cat=$('inpSpendCat').value;if(!cat)return;
-    data.spending.push({id:genId(),date:new Date().toISOString(),amount:amt,category:cat,memo:$('inpSpendMemo').value.trim()});
-    saveNow();hideModal('modalInput');if(curPage===0)renderHome();if(curPage===1)renderRecord();checkBudgetAlerts();
-  });
-  $('inpSpendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnSpendSave').click()});
-}
-
-// ===== SPENDING EDIT =====
-let editingSpendId=null;
-function openSpendEdit(id){
-  const s=data.spending.find(x=>x.id===id);
-  if(!s)return;
-  const sd=new Date(s.date),sk=sd.getFullYear()+'-'+String(sd.getMonth()+1).padStart(2,'0');
-  if(data.settledMonths[sk]){alert('確定済みの月の支出は編集できません。');return}
-  editingSpendId=id;
-  $('editSpendAmt').value=s.amount||'';
-  $('editSpendMemo').value=s.memo||'';
-  const d=new Date(s.date);
-  $('editSpendDate').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  const cat=data.categories.find(c=>c.name===s.category);
-  inputSelectedGroup=cat?cat.group:1;
-  $('editSpendCat').value=s.category||'';
-  populateCatPicker($('editGroupBtns'),$('editCatGrid'),$('editSpendCat'),s.category||'');
-  showModal('modalSpendEdit');
-}
-function initSpendEdit(){
-  $('btnSpendEditSave').addEventListener('click',()=>{
-    const s=data.spending.find(x=>x.id===editingSpendId);
-    if(!s)return;
-    const amt=clampAmt(parseFloat($('editSpendAmt').value));if(!amt||amt<=0)return $('editSpendAmt').focus();
-    s.amount=amt;
-    s.category=$('editSpendCat').value;
-    s.memo=$('editSpendMemo').value.trim();
-    const dateVal=$('editSpendDate').value;
-    if(dateVal){
-      const old=new Date(s.date);
-      const parts=dateVal.split('-');
-      const nd=new Date(+parts[0],+parts[1]-1,+parts[2],old.getHours(),old.getMinutes(),old.getSeconds());
-      s.date=nd.toISOString();
-    }
-    saveNow();hideModal('modalSpendEdit');
-    if(curPage===0)renderHome();if(curPage===1)renderRecord();
-  });
-  $('btnSpendEditDelete').addEventListener('click',()=>{
-    if(!confirm('この支出を削除しますか？'))return;
-    data.spending=data.spending.filter(x=>x.id!==editingSpendId);
-    saveNow();hideModal('modalSpendEdit');
-    if(curPage===0)renderHome();if(curPage===1)renderRecord();
-  });
-}
 
 // ===== BALANCE MODAL =====
 function initBalance(){
-  $('btnEditBalance').addEventListener('click',()=>{const sk=cY()+'-'+String(cM()).padStart(2,'0');if(data.settledMonths[sk]){alert('今月は確定済みです。確定を取り消してから残高を変更してください。');return}$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
+  $('btnEditBalance').addEventListener('click',()=>{$('inpBalance').value=data.balance.current||0;showModal('modalBalance')});
   $('btnBalanceSave').addEventListener('click',()=>{data.balance.current=clampAmt(parseFloat($('inpBalance').value));data.balance.lastUpdated=cY()+'-'+String(cM()).padStart(2,'0');saveNow();renderHome();hideModal('modalBalance')});
 }
 
-// ===== BUDGET MODAL =====
-let budgetEditGroup=1;
-function initBudget(){
-  $('btnEditBudgets').addEventListener('click',()=>{budgetEditGroup=1;renderBudgetGroupTabs();renderBudgetEdit();showModal('modalBudget')});
-  $('btnAddCat').addEventListener('click',()=>{const n=$('newCatName').value.trim();if(!n)return;if(data.categories.some(c=>c.name===n))return alert('同名カテゴリあり');data.categories.push({id:genId(),group:budgetEditGroup,name:n,amount:0,icon:'📦',color:'#6B7280'});$('newCatName').value='';renderBudgetEdit()});
-  $('btnBudgetSave').addEventListener('click',()=>{
-    $$('#budgetEditList .be-amt').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.amount=clampAmt(parseFloat(inp.value))});
-    $$('#budgetEditList .be-name').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.name=inp.value.trim()||c.name});
-    $$('#budgetEditList .be-icon').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.icon=inp.value.trim()||c.icon});
-    $$('#budgetEditList .be-color').forEach(inp=>{const c=data.categories.find(x=>x.id===inp.dataset.id);if(c)c.color=inp.value});
-    saveNow();renderRecord();renderHome();hideModal('modalBudget');
-  });
-}
-function renderBudgetGroupTabs(){
-  const t=$('budgetGroupTabs');t.innerHTML='';
-  [1,2].forEach(g=>{
-    const b=document.createElement('button');b.type='button';b.className='grp-btn'+(budgetEditGroup===g?' active':'');
-    b.textContent=g+' '+GROUP_NAMES[g];
-    b.addEventListener('click',()=>{budgetEditGroup=g;renderBudgetGroupTabs();renderBudgetEdit()});
-    t.appendChild(b);
-  });
-}
-function renderBudgetEdit(){
-  const c=$('budgetEditList');c.innerHTML='';
-  const cats=data.categories.filter(x=>x.group===budgetEditGroup);
-  cats.forEach(b=>{const d=document.createElement('div');d.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap';
-  d.innerHTML='<input type="text" class="form-input be-icon" data-id="'+b.id+'" value="'+b.icon+'" style="width:36px;height:36px;text-align:center;font-size:1rem;padding:0">'
-    +'<input type="color" class="be-color" data-id="'+b.id+'" value="'+b.color+'" style="width:32px;height:36px;border:none;padding:0;cursor:pointer;border-radius:4px">'
-    +'<input type="text" class="form-input be-name" data-id="'+b.id+'" value="'+b.name+'" style="flex:1;min-width:80px;height:36px;font-size:.8rem">'
-    +'<input type="number" inputmode="decimal" class="form-input be-amt" data-id="'+b.id+'" value="'+(b.amount||'')+'" placeholder="0" max="999900000000" style="width:90px;height:36px;font-size:.8rem">'
-    +'<button class="exp-del be-del" data-id="'+b.id+'" aria-label="'+b.name+'を削除" style="width:28px;height:28px;font-size:.85rem">×</button>';
-  c.appendChild(d)});
-  c.querySelectorAll('.be-del').forEach(btn=>{btn.addEventListener('click',()=>{const cat=data.categories.find(b=>b.id===btn.dataset.id);if(cat&&confirm('「'+cat.name+'」を削除？')){data.categories=data.categories.filter(b=>b.id!==btn.dataset.id);renderBudgetEdit()}})});
-}
 
-// ===== SETTLE =====
-function initSettle(){
-  $('btnSettle').addEventListener('click',()=>{
-    const cy=cY(),cm=cM(),key=cy+'-'+String(cm).padStart(2,'0');
-    if(data.settledMonths[key]){
-      if(!confirm('確定を取り消しますか？'))return;
-      delete data.settledMonths[key];
-      saveNow();renderRecord();renderHome();
-      return;
-    }
-    const inc=getIncome(cy,cm);
-    const expFixed=data.expenses.fixed.reduce((s,f)=>{if(f.isLoan&&isLoanPaid(f,cy,cm))return s;return s+(f.amount||0)},0);
-    const spentVar=getTotalSpending();
-    const expected=(data.balance.current||0)+inc-expFixed-spentVar;
-    let info='<div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;margin-bottom:4px">';
-    info+='<div style="font-size:.78rem;font-weight:600;margin-bottom:8px">'+cm+'月の収支</div>';
-    info+='<div class="fc-line"><span class="fc-name">月初残高</span><span class="fc-val">'+fmt(data.balance.current)+'</span></div>';
-    info+='<div class="fc-line"><span class="fc-name">収入</span><span class="fc-val" style="color:var(--green)">'+fmt(inc)+'</span></div>';
-    info+='<div class="fc-line"><span class="fc-name">固定費</span><span class="fc-val" style="color:var(--red)">'+fmt(expFixed)+'</span></div>';
-    info+='<div class="fc-line"><span class="fc-name">記録済み支出</span><span class="fc-val" style="color:var(--red)">'+fmt(spentVar)+'</span></div>';
-    info+='<div style="border-top:1.5px solid var(--border);padding-top:8px;margin-top:8px;display:flex;justify-content:space-between">';
-    info+='<span style="font-weight:600;font-size:.88rem">予想残高</span>';
-    info+='<span style="font-family:var(--font-num);font-weight:700;font-size:1.05rem;color:var(--accent)">'+fmt(expected)+'</span></div></div>';
-    $('settleInfo').innerHTML=info;
-    $('settleBalance').value='';$('settleDiff').style.display='none';
-    $('settleBalance').dataset.expected=expected;
-    showModal('modalSettle');setTimeout(()=>$('settleBalance').focus(),300);
-  });
-  $('settleBalance').addEventListener('input',()=>{
-    const actual=parseFloat($('settleBalance').value),expected=parseFloat($('settleBalance').dataset.expected),el=$('settleDiff');
-    if(isNaN(actual)){el.style.display='none';return}
-    el.style.display='block';const delta=actual-expected;
-    if(Math.abs(delta)<1){el.innerHTML='<div style="padding:12px;background:var(--green-soft);border-radius:var(--radius-sm);text-align:center"><div style="font-size:.85rem;font-weight:600;color:var(--accent)">予想通りです</div></div>'}
-    else{const label=delta<0?'把握外の支出があります':'予想より多く残っています';const c=delta<0?'var(--red)':'var(--accent)';
-    el.innerHTML='<div style="padding:12px;background:'+(delta<0?'var(--red-soft)':'var(--green-soft)')+';border-radius:var(--radius-sm);text-align:center"><div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">'+label+'</div><div style="font-family:var(--font-num);font-size:1.3rem;font-weight:700;color:'+c+'">'+fmtS(delta)+'</div></div>'}
-  });
-  $('btnSettleConfirm').addEventListener('click',()=>{
-    const actual=parseFloat($('settleBalance').value);
-    if(isNaN(actual)){alert('残高を入力してください');return}
-    if(!confirm('今月を確定しますか？残高が '+fmt(actual)+' に更新されます。'))return;
-    const expected=parseFloat($('settleBalance').dataset.expected),cy=cY(),cm=cM(),key=cy+'-'+String(cm).padStart(2,'0');
-    data.settledMonths[key]={balance:Math.round(actual),expected:Math.round(expected),diff:Math.round(actual-expected),settledAt:new Date().toISOString()};
-    data.balance.current=clampAmt(actual);data.balance.lastUpdated=key;
-    saveNow();hideModal('modalSettle');renderRecord();renderHome();
-  });
-}
 
-// ===== PREDICTIONS =====
-function getMonthSpendingByCat(monthKey){
-  const curKey=cY()+'-'+String(cM()).padStart(2,'0');
-  const items=monthKey===curKey?(data.spending||[]):(data.spendingArchive[monthKey]||[]);
-  const r={};items.forEach(s=>{if(!r[s.category])r[s.category]=0;r[s.category]+=s.amount||0});return r;
-}
-function getSettledKeys(){return Object.keys(data.settledMonths).sort()}
-function getBudgetSuggestions(){
-  const keys=getSettledKeys();if(keys.length<3)return[];
-  const recent=keys.slice(-3),sugs=[];
-  data.categories.forEach(cat=>{
-    if(cat.amount<=0)return;
-    let t=0,c=0;
-    recent.forEach(k=>{const sp=getMonthSpendingByCat(k);if(sp[cat.name]!==undefined){t+=sp[cat.name];c++}});
-    if(!c)return;
-    const avg=t/c,sug=Math.max(1000,Math.round(avg/1000)*1000),diff=sug-cat.amount;
-    if(Math.abs(diff)/cat.amount<0.1)return;
-    sugs.push({catId:cat.id,name:cat.name,icon:cat.icon,color:cat.color,current:cat.amount,suggested:sug,avg:Math.round(avg),diff});
-  });return sugs;
-}
-function getAccuracyScores(){
-  const keys=getSettledKeys();if(!keys.length)return{overall:0,categories:{},months:0};
-  const cs={};let ts=0,tc=0;
-  data.categories.forEach(cat=>{
-    if(cat.amount<=0)return;let s=0,c=0;
-    keys.forEach(k=>{const sp=getMonthSpendingByCat(k);const a=sp[cat.name]||0;s+=Math.max(0,1-Math.abs(a-cat.amount)/cat.amount);c++});
-    if(c>0){cs[cat.name]=Math.round(s/c*100);ts+=s;tc+=c}
-  });return{overall:tc?Math.round(ts/tc*100):0,categories:cs,months:keys.length};
-}
-function getCatTrend(catName,n){
-  const r=[],keys=getSettledKeys(),recent=keys.slice(-Math.max(0,n-1));
-  recent.forEach(k=>{const sp=getMonthSpendingByCat(k),p=k.split('-');r.push({key:k,year:+p[0],month:+p[1],actual:sp[catName]||0})});
-  const curKey=cY()+'-'+String(cM()).padStart(2,'0');
-  if(!data.settledMonths[curKey]){const sp=getMonthSpendingByCat(curKey);r.push({key:curKey,year:cY(),month:cM(),actual:sp[catName]||0})}
-  return r;
-}
-function renderSuggestionBanner(){
-  const c=$('homeSuggestions'),sugs=getBudgetSuggestions();
-  if(!sugs.length){c.style.display='none';return}
-  c.style.display='block';
-  c.innerHTML='<div style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(20,184,166,.06),rgba(59,130,246,.06));border:1.5px solid rgba(20,184,166,.15);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer" id="sugBannerBtn">'
-    +'<div style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem">💡</div>'
-    +'<div style="flex:1"><div style="font-size:.82rem;font-weight:600;color:var(--text)">'+sugs.length+'件の予算提案</div>'
-    +'<div style="font-size:.7rem;color:var(--text2)">実績をもとに予算を最適化できます</div></div>'
-    +'<svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text3)" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
-  $('sugBannerBtn').addEventListener('click',()=>{renderSuggestionList();showModal('modalSuggestion')});
-}
-function renderSuggestionList(){
-  const c=$('suggestionList'),sugs=getBudgetSuggestions();
-  if(!sugs.length){c.innerHTML='<div class="empty">提案はありません</div>';return}
-  let h='';
-  sugs.forEach(s=>{
-    const dc=s.diff<0?'var(--accent)':'var(--red)',db=s.diff<0?'var(--green-soft)':'var(--red-soft)',dl=(s.diff>0?'+':'')+fmt(s.diff),sc=s.color||'#6B7280';
-    h+='<div class="suggest-item" style="border-left:4px solid '+sc+';background:var(--card);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)">';
-    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:.95rem">'+s.icon+'</div>';
-    h+='<div><div style="font-size:.85rem;font-weight:600">'+s.name+'</div><div style="font-size:.7rem;color:var(--text2)">直近3ヶ月の平均: '+fmt(s.avg)+'</div></div></div>';
-    h+='<div style="background:var(--bg);border-radius:var(--radius-xs);padding:12px;margin-bottom:12px">';
-    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:.78rem;color:var(--text2)">現在の予算</span><span style="font-family:var(--font-num);font-size:.85rem;font-weight:600">'+fmt(s.current)+'</span></div>';
-    h+='<div style="display:flex;justify-content:space-between"><span style="font-size:.78rem;color:var(--text2)">提案</span><div style="display:flex;align-items:center;gap:4px"><span style="font-family:var(--font-num);font-size:.85rem;font-weight:600;color:'+dc+'">'+fmt(s.suggested)+'</span><span style="font-size:.68rem;padding:2px 6px;border-radius:4px;font-weight:600;font-family:var(--font-num);background:'+db+';color:'+dc+'">'+dl+'</span></div></div></div>';
-    h+='<div style="display:flex;gap:8px"><button class="suggest-accept" data-cat-id="'+s.catId+'" data-amount="'+s.suggested+'" style="flex:1;height:40px;border-radius:var(--radius-xs);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;font-size:.82rem;border:none;cursor:pointer">更新する</button>';
-    h+='<button class="suggest-skip" style="flex:1;height:40px;border-radius:var(--radius-xs);background:var(--bg);border:1.5px solid var(--border);color:var(--text3);font-weight:500;font-size:.82rem;cursor:pointer">スキップ</button></div></div>';
-  });
-  c.innerHTML=h;
-  c.querySelectorAll('.suggest-accept').forEach(btn=>{btn.addEventListener('click',()=>{
-    const cat=data.categories.find(x=>x.id===btn.dataset.catId);if(cat){cat.amount=+btn.dataset.amount;saveNow()}
-    btn.closest('.suggest-item').remove();if(!c.querySelector('.suggest-item')){hideModal('modalSuggestion');renderHome();renderRecord()}
-  })});
-  c.querySelectorAll('.suggest-skip').forEach(btn=>{btn.addEventListener('click',()=>{
-    btn.closest('.suggest-item').remove();if(!c.querySelector('.suggest-item')){hideModal('modalSuggestion');renderHome();renderRecord()}
-  })});
-}
-function buildTrendSVG(budget,td){
-  if(!td.length)return'';
-  const W=288,H=100,pL=36,pR=4,pT=12,pB=18,cW=W-pL-pR,cH=H-pT-pB;
-  const vals=td.map(d=>d.actual),maxV=Math.max(budget*1.3,...vals,1);
-  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'">';
-  for(let i=0;i<=2;i++){const y=pT+(cH*i/2),v=maxV*(1-i/2);s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--border)" stroke-width=".5"/>';s+='<text x="'+(pL-4)+'" y="'+(y+3)+'" fill="var(--text3)" font-size="7" font-family="var(--font-num)" text-anchor="end">'+fmtShort(v)+'</text>'}
-  if(budget>0){const by=pT+cH*(1-budget/maxV);s+='<line x1="'+pL+'" y1="'+by+'" x2="'+(W-pR)+'" y2="'+by+'" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".4"/>'}
-  if(td.length>1){const step=cW/(td.length-1);const pts=td.map((d,i)=>({x:pL+i*step,y:pT+cH*(1-d.actual/maxV),a:d.actual}));
-    const over=budget>0&&pts.some(p=>p.a>budget),lc=over?'var(--red)':'var(--accent)';
-    s+='<path d="M'+pts.map(p=>p.x+','+p.y).join(' L')+'" fill="none" stroke="'+lc+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
-    pts.forEach((p,i)=>{s+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+lc+'"'+(i===pts.length-1?' stroke="#fff" stroke-width="2"':'')+'/>'});
-    td.forEach((d,i)=>{s+='<text x="'+(pL+i*step)+'" y="'+(H-2)+'" fill="var(--text3)" font-size="8" font-family="var(--font-num)" text-anchor="middle">'+d.month+'月</text>'});
-  }else if(td.length===1){const x=pL+cW/2,y=pT+cH*(1-td[0].actual/maxV);s+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="var(--accent)"/>';s+='<text x="'+x+'" y="'+(H-2)+'" fill="var(--text3)" font-size="8" font-family="var(--font-num)" text-anchor="middle">'+td[0].month+'月</text>'}
-  s+='</svg>';return s;
-}
-function renderTrends(){
-  const c=$('trendContent'),keys=getSettledKeys();
-  const hasData=keys.length>0||data.spending.length>0;
-  if(!hasData){c.innerHTML='<div class="empty" style="font-size:.72rem">確定月のデータが貯まるとトレンドが表示されます</div>';return}
-  let h='<div style="display:flex;gap:12px;justify-content:flex-end;margin-bottom:8px;font-size:.65rem"><span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:2.5px;border-radius:2px;background:var(--accent)"></span>実績</span><span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:0;border-top:1.5px dashed var(--text3);opacity:.5"></span>予算</span></div>';
-  const cats=data.categories.filter(cat=>{if(cat.amount<=0)return false;const tr=getCatTrend(cat.name,6);return tr.some(d=>d.actual>0)});
-  if(!cats.length){c.innerHTML='<div class="empty" style="font-size:.72rem">カテゴリ予算を設定して支出を記録すると表示されます</div>';return}
-  cats.forEach(cat=>{
-    const tr=getCatTrend(cat.name,6),avg=tr.length?Math.round(tr.reduce((s,d)=>s+d.actual,0)/tr.length):0;
-    const overCnt=cat.amount>0?tr.filter(d=>d.actual>cat.amount).length:0;
-    h+='<div style="margin-bottom:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
-    h+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:.85rem">'+cat.icon+'</span><span style="font-size:.82rem;font-weight:600">'+cat.name+'</span></div>';
-    if(overCnt>0)h+='<span style="font-size:.65rem;color:var(--red);font-weight:500">'+overCnt+'ヶ月予算超過</span>';
-    h+='</div>'+buildTrendSVG(cat.amount,tr);
-    h+='<div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--text2);margin-top:4px"><span>平均: <strong style="font-family:var(--font-num);color:var(--text)">'+fmt(avg)+'</strong></span><span>予算: <strong style="font-family:var(--font-num);color:var(--text)">'+fmt(cat.amount)+'</strong></span></div></div>';
-  });
-  c.innerHTML=h;
-}
-function renderAccuracy(){
-  const c=$('settingsAccuracy'),sc=getAccuracyScores();
-  if(!sc.months){c.style.display='none';return}
-  c.style.display='block';
-  const circ=2*Math.PI*22,dash=(sc.overall/100*circ).toFixed(1);
-  const col=sc.overall>=70?'var(--accent)':sc.overall>=40?'var(--orange)':'var(--red)';
-  let h='<div class="card-title">予測精度</div>';
-  h+='<div style="display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:10px">';
-  h+='<div style="position:relative;width:56px;height:56px;flex-shrink:0"><svg viewBox="0 0 56 56" width="56" height="56" style="transform:rotate(-90deg)"><circle cx="28" cy="28" r="22" fill="none" stroke="var(--bg)" stroke-width="5"/><circle cx="28" cy="28" r="22" fill="none" stroke="'+col+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+dash+' '+circ+'"/></svg>';
-  h+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-num);font-size:.95rem;font-weight:700;color:'+col+'">'+sc.overall+'%</div></div>';
-  h+='<div><div style="font-size:.75rem;color:var(--text2)">全体の精度</div><div style="font-family:var(--font-num);font-size:1.1rem;font-weight:700;color:'+col+'">'+sc.overall+' / 100</div>';
-  h+='<div style="font-size:.65rem;color:var(--text3)">確定月: '+sc.months+'ヶ月</div></div></div>';
-  const entries=Object.entries(sc.categories).sort((a,b)=>b[1]-a[1]);
-  if(entries.length){h+='<div style="display:flex;flex-direction:column;gap:6px">';
-    entries.forEach(([name,score])=>{const sc2=score>=70?'var(--accent)':score>=40?'var(--orange)':'var(--red)';
-    h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:.75rem;color:var(--text2);width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>';
-    h+='<div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:'+score+'%;height:100%;border-radius:3px;background:'+sc2+'"></div></div>';
-    h+='<span style="font-family:var(--font-num);font-size:.72rem;font-weight:600;color:'+sc2+';width:32px;text-align:right">'+score+'%</span></div>'});
-  h+='</div>'}
-  h+='<div style="font-size:.65rem;color:var(--text3);margin-top:10px;line-height:1.4">確定月が増えるほど予測が正確になります。3ヶ月以上で予算の自動提案が有効になります。</div>';
-  c.innerHTML=h;
-}
 
-// ===== BUDGET NOTIFICATIONS =====
-const NOTIF_SK='moneyflow_notif';
-function getNotifState(){try{return JSON.parse(localStorage.getItem(NOTIF_SK))||{}}catch(e){return{}}}
-function setNotifState(s){localStorage.setItem(NOTIF_SK,JSON.stringify(s))}
-
-function sendNotif(title,body,tag){
-  if(!data.settings.notifications||Notification.permission!=='granted')return;
-  const s=getNotifState(),today=new Date().toISOString().slice(0,10);
-  if(s[tag]===today)return; // 同じ日に同じ種類は1回だけ
-  s[tag]=today;setNotifState(s);
-  if('serviceWorker' in navigator&&navigator.serviceWorker.controller){
-    navigator.serviceWorker.ready.then(reg=>{reg.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png',tag})});
-  }else{new Notification(title,{body,icon:'icon-192.png',tag})}
-}
-
-function checkBudgetAlerts(){
-  if(!data.settings.notifications||Notification.permission!=='granted')return;
-  const byCat=getSpendingByCat(),n=now(),day=n.getDate(),lastDay=new Date(n.getFullYear(),n.getMonth()+1,0).getDate();
-  let totalBudget=0,totalSpent=0;
-  Object.values(byCat).forEach(v=>{totalBudget+=v.budget;totalSpent+=v.spent});
-
-  // 月半ばチェック: 15日以降 && 予算消化率60%超
-  if(day>=15&&totalBudget>0){
-    const pct=Math.round(totalSpent/totalBudget*100);
-    if(pct>=60){
-      sendNotif(
-        '今月のペースが速いかも',
-        '予算の'+pct+'%を使用済み（残り'+(lastDay-day)+'日）',
-        'monthly-pace'
-      );
-    }
-  }
-
-  // 月末マイナス予測チェック
-  if(totalBudget>0&&totalSpent>totalBudget){
-    sendNotif(
-      '今月の予算をオーバーしています',
-      '予算 '+fmt(totalBudget)+' に対し '+fmt(totalSpent)+' 使用中',
-      'monthly-over'
-    );
-  }
-
-  // 週の予算超過チェック: 今週(月〜日)の支出 > 月予算÷4
-  if(totalBudget>0){
-    const weekBudget=Math.round(totalBudget/4);
-    const dayOfWeek=n.getDay()||7; // 月=1 ... 日=7
-    const weekStart=new Date(n.getFullYear(),n.getMonth(),n.getDate()-dayOfWeek+1);
-    weekStart.setHours(0,0,0,0);
-    let weekSpent=0;
-    data.spending.forEach(s=>{
-      const sd=new Date(s.date);
-      if(sd>=weekStart)weekSpent+=s.amount||0;
-    });
-    if(weekSpent>weekBudget){
-      sendNotif(
-        '今週の支出が多めです',
-        '週の目安 '+fmt(weekBudget)+' に対し '+fmt(weekSpent)+' 使用中',
-        'weekly-over'
-      );
-    }
-  }
-
-  // カテゴリ別チェック: 個別カテゴリが80%超 (月半ば以降)
-  if(day>=15){
-    Object.entries(byCat).forEach(([name,v])=>{
-      if(v.budget>0){
-        const pct=Math.round(v.spent/v.budget*100);
-        if(pct>=80){
-          sendNotif(
-            name+'の予算が残りわずか',
-            '予算の'+pct+'%を使用済み（残り'+fmt(v.budget-v.spent)+'）',
-            'cat-'+name
-          );
-        }
-      }
-    });
-  }
-}
 
 // ===== SERVICE WORKER =====
 function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW registration failed:',e))}
@@ -2223,9 +1394,8 @@ function regSW(){if('serviceWorker' in navigator)navigator.serviceWorker.registe
 // ===== INIT =====
 function init(){
   loadData();autoCarryover();
-  initNav();initCollapse();initInput();initSpendEdit();initBalance();initFixedModal();initVarModal();initBudget();initForecast();initCalendar();initSettings();initSettle();regSW();
+  initNav();initCollapse();initBalance();initFixedModal();initVarModal();initForecast();initCalendar();initSettings();regSW();
   goToPage(0);
-  setTimeout(checkBudgetAlerts,2000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
